@@ -12,7 +12,6 @@ class Window {
 
         ~Window();
 
-        // TODO remove 
         void foo() {}
 
     private:
