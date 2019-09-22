@@ -36,4 +36,4 @@ Window::~Window() {
     }
 }
 
-unsigned int Window::_window_count = 0;;
+unsigned int Window::_window_count = 0;

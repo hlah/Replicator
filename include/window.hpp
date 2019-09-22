@@ -11,7 +11,12 @@ class Window {
         Window(const std::string& title, unsigned int width, unsigned int height);
 
         ~Window();
-        void foo() {}
+
+        void poll_events() { glfwPollEvents(); }
+
+        // Getters and setters
+        bool should_close() { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
+        void should_close(bool flag) { return glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
 
     private:
         GLFWwindow* _glfw_window_ptr;

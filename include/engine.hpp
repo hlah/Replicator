@@ -1,6 +1,8 @@
 #ifndef _REPLICATOR_ENGINE_HPP_
 #define _REPLICATOR_ENGINE_HPP_
 
+#include "state.hpp"
+
 #include <string>
 
 class Engine {
@@ -9,7 +11,10 @@ class Engine {
         Engine() : _running{false}, _width{512}, _height{512}, _title{} {}
 
         // run engine
-        void run();
+        void run(State* state_ptr);
+
+        // stop engine
+        void stop();
 
         // Setters
         void set_window_size(unsigned int width, unsigned int height);
