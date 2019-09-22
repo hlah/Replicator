@@ -11,7 +11,6 @@ class Window {
         Window(const std::string& title, unsigned int width, unsigned int height);
 
         ~Window();
-
         void foo() {}
 
     private:

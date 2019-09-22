@@ -1,26 +1,19 @@
 #include <iostream>
 
-#include "window.hpp"
-#include "shaders.hpp"
-
-#include <fstream>
-#include <streambuf>
+#include "engine.hpp"
 
 int main() {
-    auto window = Window{"Test", 800, 800};
-    window.foo();
 
-    std::ifstream vs_file( "../shaders/vertex_test.glsl" );
-    std::string vs_source{ std::istreambuf_iterator<char>(vs_file), std::istreambuf_iterator<char>() };
-    vs_file.close();
-    Shader vertex_shader{Shader::Type::VERTEX, vs_source };
+    auto engine = Engine{};
+    engine.set_window_size(800, 600);
+    engine.set_window_title("Replicator");
 
-    std::ifstream fs_file( "../shaders/fragment_test.glsl" );
-    std::string fs_source{ std::istreambuf_iterator<char>(fs_file), std::istreambuf_iterator<char>() };
-    fs_file.close();
-    Shader fragment_shader{Shader::Type::FRAGMENT, fs_source };
+    //Scene main_scene{}
+    //scene.add_object(...);
 
-    ShaderProgram program{vertex_shader, fragment_shader};
+    //engine.set_scene(main_scene);
 
+    engine.run();
+    
     return 0;
 }
