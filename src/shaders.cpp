@@ -1,7 +1,6 @@
 #include "shaders.hpp"
 
 // Shader class
-
 Shader::Shader(Shader::Type type, std::string& source) {
     GLuint shader_id = glCreateShader( (GLuint)type );
     const GLchar* source_ptr = source.c_str();
@@ -81,3 +80,6 @@ ShaderProgram::~ShaderProgram() {
 }
 
 
+void ShaderProgram::use() const {
+    glUseProgram(*_program_id_shared);
+}

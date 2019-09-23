@@ -12,11 +12,21 @@ class Window {
 
         ~Window();
 
+        // Update events
         void poll_events() { glfwPollEvents(); }
+        // Clear window
+        void clear();
+        // Refresh window
+        void refresh();
 
         // Getters and setters
+
+        // Return true if window close flag is set
         bool should_close() { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
         void should_close(bool flag) { return glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
+
+        // Set clear color
+        void clear_color( float red, float green, float blue, float alpha=1.0 );
 
     private:
         GLFWwindow* _glfw_window_ptr;

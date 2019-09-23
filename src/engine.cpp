@@ -2,14 +2,19 @@
 
 #include "window.hpp"
 #include "state.hpp"
-
-#include <iostream>
+#include "object.hpp"
 
 void Engine::run(State* state_ptr) {
     _running = true;
     Window window{ _title, _width, _height };
 
+    Object scene{};
+
+    state_ptr->on_start(scene);
+
     while( _running ) {
+        window.poll_events();
+
         auto transition = State::Transition::NONE;
         if( window.should_close() ) {
             transition = state_ptr->on_close();
@@ -23,7 +28,9 @@ void Engine::run(State* state_ptr) {
 
         state_ptr->update();
 
-        window.poll_events();
+        window.clear();
+        scene.draw();
+        window.refresh();
     }
 }
 

@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include <iostream>
-
 Window::Window(const std::string& title, unsigned int width, unsigned int height) {
     if( _window_count == 0 ) {
         if(!glfwInit()) {
@@ -34,6 +32,18 @@ Window::~Window() {
         glfwTerminate();
         _window_count--;
     }
+}
+
+void Window::clear() {
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Window::refresh() {
+    glfwSwapBuffers(_glfw_window_ptr);
+}
+
+void Window::clear_color( float red, float green, float blue, float alpha ) {
+    glClearColor( red, green, blue, alpha );
 }
 
 unsigned int Window::_window_count = 0;

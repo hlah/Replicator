@@ -33,6 +33,9 @@ class ShaderProgram {
 
         ~ShaderProgram();
 
+        // Use shader program
+        void use() const;
+
     private:
         std::shared_ptr<GLuint> _program_id_shared;
 };

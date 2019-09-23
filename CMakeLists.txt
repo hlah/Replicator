@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 project(Replicator)
 
 # Set warning and errors flags
-set(warnings "-Wall -Wextra -Werror")
+set(CMAKE_CXX_STANDARD 17)
+set(warnings "-Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-error=unused-but-set-variable")
 set(CMAKE_CXX_FLAGS "${warnings}")
 set(CMAKE_C_FLAGS   "${warnings}")
 
