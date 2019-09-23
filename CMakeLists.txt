@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.15)
 project(Replicator)
 
+# GLFW
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(glfw-3.3)
+
 # Set warning and errors flags
 set(CMAKE_CXX_STANDARD 17)
 set(warnings "-Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-error=unused-but-set-variable")
 set(CMAKE_CXX_FLAGS "${warnings}")
 set(CMAKE_C_FLAGS   "${warnings}")
 
-# Find GLFW
-find_package(glfw3 3.3 REQUIRED)
-find_package(OpenGL REQUIRED)
 
 # Add include folder
 include_directories(include)
