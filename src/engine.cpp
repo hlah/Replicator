@@ -9,8 +9,8 @@
 void Engine::run(State* state_ptr) {
     _running = true;
 
-    Window window{ _title, _width, _height };
     spdlog::info("Creating window.");
+    Window window{ _title, _width, _height };
     Object scene{};
 
     spdlog::info("Running!");

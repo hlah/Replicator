@@ -35,6 +35,12 @@ class Window {
         static unsigned int _window_count;
 };
 
-
+class WindowException : public std::exception {
+    public:
+        WindowException( const std::string& msg ) : _msg{msg} {}
+        const char* what() const throw() { return _msg.c_str(); }
+    private:
+        const std::string _msg;
+};
 
 #endif //  _REPLICATOR_WINDOW_H_
