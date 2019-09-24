@@ -5,6 +5,15 @@
 #include <stdexcept>
 
 void glfw_error_callback(int code, const char* description);
+void GLAPIENTRY opengl_error_callback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* user_param
+);
 
 Window::Window(const std::string& title, unsigned int width, unsigned int height) {
     if( _window_count == 0 ) {
@@ -24,7 +33,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
             throw WindowException{"Could not create window!"};
         }
 
-        // register error callback
+        // register GLFW error callback
         glfwSetErrorCallback( glfw_error_callback );
 
         glfwMakeContextCurrent(_glfw_window_ptr);
@@ -32,6 +41,10 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
             glfwTerminate();
             throw WindowException{"Could not load Open GL."};
         }
+
+        // enable and register OpenGL error callback
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback( opengl_error_callback, nullptr );
 
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);
@@ -70,8 +83,39 @@ void Window::clear_color( float red, float green, float blue, float alpha ) {
     glClearColor( red, green, blue, alpha );
 }
 
+
+/// Error callbacks
+
 void glfw_error_callback(int code, const char* description) {
     spdlog::error("GLFW error code {}: {}", code, description);
 }
+
+void GLAPIENTRY opengl_error_callback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* user_param
+        ) {
+    switch(type) {
+        case GL_DEBUG_TYPE_ERROR:
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+            spdlog::error("OpenGL: {}", message);
+            break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        case GL_DEBUG_TYPE_PORTABILITY:
+            spdlog::warn("OpenGL: {}", message);
+            break;
+        case GL_DEBUG_TYPE_PERFORMANCE:
+            spdlog::debug("OpenGL: {}", message);
+            break;
+        default:
+            spdlog::debug("OpenGL: {}", message);
+            break;
+    }
+}
+
 
 unsigned int Window::_window_count = 0;

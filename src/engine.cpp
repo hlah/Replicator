@@ -9,6 +9,8 @@
 void Engine::run(State* state_ptr) {
     _running = true;
 
+    spdlog::set_level(spdlog::level::debug);
+
     spdlog::info("Creating window.");
     Window window{ _title, _width, _height };
     Object scene{};
