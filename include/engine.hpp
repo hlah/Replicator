@@ -3,6 +3,8 @@
 
 #include "state.hpp"
 
+#include "spdlog/spdlog.h"
+
 #include <string>
 
 class Engine {
@@ -26,6 +28,14 @@ class Engine {
         unsigned int _width;
         unsigned int _height;
         std::string _title;
+
+#ifdef DEBUG
+        spdlog::level::level_enum _loglevel = spdlog::level::debug;
+#else 
+        spdlog::level::level_enum _loglevel = spdlog::level::info;
+#endif
+
+
 };
 
 #endif // _REPLICATOR_ENGINE_HPP_

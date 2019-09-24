@@ -4,12 +4,10 @@
 #include "state.hpp"
 #include "object.hpp"
 
-#include "spdlog/spdlog.h"
-
 void Engine::run(State* state_ptr) {
     _running = true;
 
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(_loglevel);
 
     spdlog::info("Creating window.");
     Window window{ _title, _width, _height };
