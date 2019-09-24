@@ -4,12 +4,16 @@
 #include "state.hpp"
 #include "object.hpp"
 
+#include "spdlog/spdlog.h"
+
 void Engine::run(State* state_ptr) {
     _running = true;
-    Window window{ _title, _width, _height };
 
+    Window window{ _title, _width, _height };
+    spdlog::info("Creating window.");
     Object scene{};
 
+    spdlog::info("Running!");
     state_ptr->on_start(scene);
 
     while( _running ) {
@@ -32,6 +36,7 @@ void Engine::run(State* state_ptr) {
         scene.draw();
         window.refresh();
     }
+    spdlog::info("Stoped.");
 }
 
 void Engine::stop() {

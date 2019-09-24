@@ -9,15 +9,12 @@
 class MyState : public State {
     public:
         virtual Transition on_start(Object &scene) {
-            std::cout << "Creating mesh..." << std::flush;
             MeshBuilder mb;
             mb.add_vertex( 0.0, 0.5, -0.1 );
             mb.add_vertex( 0.5, -0.5, -0.1 );
             mb.add_vertex( -0.5, -0.5, -0.1 );
             auto mesh = mb.build();
-            std::cout << "created!\n";
 
-            std::cout << "Loading shaders..." << std::flush;
             std::ifstream vs_file( "../shaders/vertex_test.glsl" );
             std::string vs_source{ std::istreambuf_iterator<char>(vs_file), std::istreambuf_iterator<char>() };
             vs_file.close();
@@ -29,7 +26,6 @@ class MyState : public State {
             Shader fragment_shader{Shader::Type::FRAGMENT, fs_source };
 
             ShaderProgram program{vertex_shader, fragment_shader};
-            std::cout << "loaded!\n";
 
             Object obj;
             obj.set_mesh( mesh );
