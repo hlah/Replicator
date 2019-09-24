@@ -7,9 +7,6 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 
-# Boost
-add_subdirectory(boost-cmake)
-
 # Set warning and errors flags
 set(CMAKE_CXX_STANDARD 17)
 set(warnings "-Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-error=unused-but-set-variable")
@@ -25,7 +22,6 @@ file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::log)
 
 
 
