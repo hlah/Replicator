@@ -1,5 +1,7 @@
 #include "shaders.hpp"
 
+#include "spdlog/spdlog.h"
+
 // Shader class
 Shader::Shader(Shader::Type type, std::string& source) {
     GLuint shader_id = glCreateShader( (GLuint)type );
@@ -29,11 +31,13 @@ Shader::Shader(Shader::Type type, std::string& source) {
     }
 
     _shader_id_shared.reset(new GLuint{shader_id});
+    spdlog::debug("Created shader, id={}", *_shader_id_shared);
 }
 
 Shader::~Shader() {
     if( _shader_id_shared.unique() ) {
         glDeleteShader( *_shader_id_shared );
+        spdlog::debug("Deleted shader, id={}", *_shader_id_shared);
     }
 }
 
@@ -71,11 +75,13 @@ ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaders) {
     }
 
     _program_id_shared.reset(new GLuint{program_id});
+    spdlog::debug("Created shader program, id={}", *_program_id_shared);
 }
 
 ShaderProgram::~ShaderProgram() {
     if( _program_id_shared.unique() ) {
-        glDeleteShader( *_program_id_shared );
+        glDeleteProgram( *_program_id_shared );
+        spdlog::debug("Deleted shader program, id={}", *_program_id_shared);
     }
 }
 

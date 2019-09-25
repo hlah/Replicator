@@ -23,6 +23,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
             glfw_error_callback( code, description );
             throw WindowException{"Could not load init GLFW!"};
         }
+        spdlog::info("Initialized GLFW.");
         _glfw_window_ptr = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
         if (!_glfw_window_ptr) 
         {
@@ -32,6 +33,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
             glfwTerminate();
             throw WindowException{"Could not create window!"};
         }
+        spdlog::info("Created window.");
 
         // register GLFW error callback
         glfwSetErrorCallback( glfw_error_callback );
@@ -50,7 +52,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         const GLubyte* renderer = glGetString(GL_RENDERER);
         const GLubyte* gl_version = glGetString(GL_VERSION);
         const GLubyte* glsl_version = glGetString(GL_SHADING_LANGUAGE_VERSION);
-        spdlog::info("Loaded OpenGL");
+        spdlog::info("Loaded OpenGL.");
         spdlog::info("GPU: {} {}", vendor, renderer);
         spdlog::info("OpenGL version: {}", gl_version);
         spdlog::info("GLSL version: {}", glsl_version);
@@ -66,7 +68,9 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
 Window::~Window() {
     if( _ref_counter.unique() ) {
         glfwDestroyWindow(_glfw_window_ptr);
+        spdlog::debug("Destroyed window.");
         glfwTerminate();
+        spdlog::debug("GLFW terminated.");
         _window_count--;
     }
 }

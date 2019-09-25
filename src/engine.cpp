@@ -9,13 +9,11 @@ void Engine::run(State* state_ptr) {
 
     spdlog::set_level(_loglevel);
 
-    spdlog::info("Creating window.");
     Window window{ _title, _width, _height };
     Object scene{};
 
     spdlog::info("Running!");
     state_ptr->on_start(scene);
-
     while( _running ) {
         window.poll_events();
 
