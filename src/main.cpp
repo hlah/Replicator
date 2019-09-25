@@ -11,8 +11,11 @@ class MyState : public State {
         virtual Transition on_start(Object &scene) {
             MeshBuilder mb;
             mb.add_vertex( 0.0, 0.5, -0.1 );
+            mb.add_color( 1.0, 0.0, 0.0 );
             mb.add_vertex( 0.5, -0.5, -0.1 );
+            mb.add_color( 0.0, 1.0, 0.0 );
             mb.add_vertex( -0.5, -0.5, -0.1 );
+            mb.add_color( 0.0, 0.0, 1.0 );
             auto mesh = mb.build();
 
             std::ifstream vs_file( "../shaders/vertex_test.glsl" );
