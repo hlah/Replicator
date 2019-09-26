@@ -13,7 +13,10 @@ void Engine::run(State* state_ptr) {
     Object scene{};
 
     spdlog::info("Running!");
-    state_ptr->on_start(scene);
+
+    World world{};
+
+    state_ptr->on_start(world);
     while( _running ) {
         window.poll_events();
 
@@ -31,7 +34,7 @@ void Engine::run(State* state_ptr) {
         state_ptr->update();
 
         window.clear();
-        scene.draw();
+        world.draw();
         window.refresh();
     }
     spdlog::info("Stoped.");

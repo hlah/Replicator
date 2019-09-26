@@ -8,7 +8,7 @@
 
 class MyState : public State {
     public:
-        virtual Transition on_start(Object &scene) {
+        virtual Transition on_start(World &world) {
             MeshBuilder mb;
             mb.add_vertex( 0.0, 0.5, -0.1 );
             mb.add_color( 1.0, 0.0, 0.0 );
@@ -30,11 +30,11 @@ class MyState : public State {
 
             ShaderProgram program{vertex_shader, fragment_shader};
 
-            Object obj;
+            auto obj_id = world.create_object( world.root() );
+            auto& obj = world.get_object( obj_id );
             obj.set_mesh( mesh );
             obj.set_shader_program( program );
 
-            scene.add_child(obj);
             return State::Transition::NONE;
         }
 

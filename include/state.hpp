@@ -1,7 +1,7 @@
 #ifndef _REPLICATOR_STATE_HPP_
 #define _REPLICATOR_STATE_HPP_
 
-#include "object.hpp"
+#include "world.hpp"
 
 class State {
     public:
@@ -11,7 +11,7 @@ class State {
             QUIT,
         };
 
-        virtual Transition on_start(Object& scene) { return Transition::NONE; }
+        virtual Transition on_start(World& world) { return Transition::NONE; }
         virtual Transition update() { return Transition::NONE; }
         virtual Transition on_close() { return Transition::QUIT; }
 };
