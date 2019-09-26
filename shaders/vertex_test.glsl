@@ -5,7 +5,9 @@ layout (location = 1) in vec4 color_in;
 
 out vec4 color_f;
 
+uniform mat4 model_transform;
+
 void main() {
-    gl_Position = vertice_in;
+    gl_Position = model_transform * vertice_in;
     color_f = color_in;
 }

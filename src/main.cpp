@@ -2,6 +2,10 @@
 #include "state.hpp"
 #include "mesh.hpp"
 
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <streambuf>
@@ -34,6 +38,7 @@ class MyState : public State {
             auto& obj = world.get_object( obj_id );
             obj.set_mesh( mesh );
             obj.set_shader_program( program );
+            obj.set_model_transform( glm::scale( glm::vec3{ 1.5, 0.5, 1.0 } ) );
 
             return State::Transition::NONE;
         }

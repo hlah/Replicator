@@ -1,5 +1,7 @@
 #include "world.hpp"
 
+#include "spdlog/spdlog.h"
+
 World::World() {
     Object root{};
     _objects[_next_id] = root;
@@ -30,9 +32,13 @@ void World::draw() const {
         stack.pop_back();
 
 
-
         auto obj = _objects.at( next );
         if( obj._mesh && obj._shader_program ) {
+            if( obj._model_transform ) {
+                obj._shader_program->uniform( "model_transform", *obj._model_transform );
+            } else {
+                obj._shader_program->uniform( "model_transform", glm::mat4{1.0} );
+            }
             obj._mesh->draw( *obj._shader_program );
         }
 

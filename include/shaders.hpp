@@ -3,8 +3,12 @@
 
 #include "glad/glad.h"
 
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 #include <string>
 #include <memory>
+#include <vector>
 
 class Shader {
     public:
@@ -36,8 +40,23 @@ class ShaderProgram {
         // Use shader program
         void use() const;
 
+        // Set uniform value
+        void uniform( const std::string name, const glm::mat4& value ) {
+            auto location = glGetUniformLocation( *_program_id_shared, name.c_str() );
+            _uniforms_to_set.push_back( { location, value } );
+        }
+
     private:
         std::shared_ptr<GLuint> _program_id_shared;
+
+        // For uniform setting
+        struct uniform_pair {
+            GLint location;
+            glm::mat4 value;
+        };
+
+        mutable std::vector<uniform_pair> _uniforms_to_set;
+
 };
 
 class ShaderException : public std::exception {

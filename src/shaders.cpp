@@ -88,4 +88,10 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::use() const {
     glUseProgram(*_program_id_shared);
+    // set pending uniforms
+    while( !_uniforms_to_set.empty() ) {
+        auto& uniform = _uniforms_to_set.back();
+        glUniformMatrix4fv( uniform.location, 1, GL_FALSE, glm::value_ptr(uniform.value) );
+        _uniforms_to_set.pop_back();
+    }
 }

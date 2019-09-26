@@ -15,11 +15,14 @@ class Object {
         // set object mesh
         void set_mesh( Mesh mesh ) { _mesh = mesh; }
         // add shader program
-        void set_shader_program( const ShaderProgram program ) { _shader_program = program; }
+        void set_shader_program( const ShaderProgram& program ) { _shader_program = program; }
+        // set model transform
+        void set_model_transform( const glm::mat4& transform ) { _model_transform = transform; }
     private:
         std::vector<ObjectId> _children;
         std::optional<Mesh> _mesh;
         std::optional<ShaderProgram> _shader_program;
+        std::optional<glm::mat4> _model_transform;
 
         // add child object
         void add_child( const ObjectId child ) { _children.push_back(child); }
