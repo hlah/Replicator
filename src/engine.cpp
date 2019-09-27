@@ -3,6 +3,7 @@
 #include "window.hpp"
 #include "state.hpp"
 #include "object.hpp"
+#include "matrix_op.hpp"
 
 void Engine::run(State* state_ptr) {
     _running = true;
@@ -10,7 +11,6 @@ void Engine::run(State* state_ptr) {
     spdlog::set_level(_loglevel);
 
     Window window{ _title, _width, _height };
-    Object scene{};
 
     spdlog::info("Running!");
 
@@ -19,6 +19,15 @@ void Engine::run(State* state_ptr) {
     state_ptr->on_start(world);
     while( _running ) {
         window.poll_events();
+
+        if( window.was_resized_reset() ) {
+            world.set_projection_matrix( 
+                    matrix_op::perspective(
+                    _fov, window.aspect_ratio(),
+                    _near, _far
+                )
+            );
+        }
 
         auto transition = State::Transition::NONE;
         if( window.should_close() ) {

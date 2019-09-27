@@ -2,9 +2,9 @@
 #include "state.hpp"
 #include "mesh.hpp"
 
+#include "matrix_op.hpp"
+
 #include "glm/mat4x4.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -14,11 +14,11 @@ class MyState : public State {
     public:
         virtual Transition on_start(World &world) {
             MeshBuilder mb;
-            mb.add_vertex( 0.0, 0.5, -0.1 );
+            mb.add_vertex( 0.0, 0.5, 0.0 );
             mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_vertex( 0.5, -0.5, -0.1 );
+            mb.add_vertex( 0.5, -0.5, 0.0 );
             mb.add_color( 0.0, 1.0, 0.0 );
-            mb.add_vertex( -0.5, -0.5, -0.1 );
+            mb.add_vertex( -0.5, -0.5, 0.0 );
             mb.add_color( 0.0, 0.0, 1.0 );
             auto mesh = mb.build();
 
@@ -38,7 +38,7 @@ class MyState : public State {
             auto& obj = world.get_object( obj_id );
             obj.set_mesh( mesh );
             obj.set_shader_program( program );
-            obj.set_model_transform( glm::scale( glm::vec3{ 1.5, 0.5, 1.0 } ) );
+            obj.set_model_transform( matrix_op::translation( 0.0, 0.0, -2.0 ) );
 
             return State::Transition::NONE;
         }

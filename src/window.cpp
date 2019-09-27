@@ -15,7 +15,9 @@ void GLAPIENTRY opengl_error_callback(
         const void* user_param
 );
 
-Window::Window(const std::string& title, unsigned int width, unsigned int height) {
+Window::Window(const std::string& title, unsigned int width, unsigned int height) 
+    : _width{width}, _height{height}
+{
     if( _window_count == 0 ) {
         if(!glfwInit()) {
             const char* description;
@@ -56,10 +58,14 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         spdlog::info("GPU: {} {}", vendor, renderer);
         spdlog::info("OpenGL version: {}", gl_version);
         spdlog::info("GLSL version: {}", glsl_version);
+
+        // register window calbacks
+        glfwSetFramebufferSizeCallback( _glfw_window_ptr, Window::_glfw_framebuffer_size );
         
 
         _ref_counter.reset(new bool);
         _window_count++;
+        _current_window = this;
     } else {
         throw std::runtime_error{"Only one window is allowed at the same time."};
     }
@@ -87,6 +93,13 @@ void Window::clear_color( float red, float green, float blue, float alpha ) {
     glClearColor( red, green, blue, alpha );
 }
 
+/// Window callbacks
+void Window::_glfw_framebuffer_size(GLFWwindow* window, int width, int height) {
+    _current_window->_width = width;
+    _current_window->_height = height;
+    _current_window->_changed_size = true;
+    glViewport( 0, 0, width, height );
+}
 
 /// Error callbacks
 
@@ -121,5 +134,5 @@ void GLAPIENTRY opengl_error_callback(
     }
 }
 
-
 unsigned int Window::_window_count = 0;
+Window* Window::_current_window = nullptr;

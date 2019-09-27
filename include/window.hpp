@@ -21,9 +21,25 @@ class Window {
 
         // Getters and setters
 
+        unsigned int width() const { return _width; }
+        unsigned int height() const { return _height; }
+        float aspect_ratio() const { return (float)_width/_height; }
+
         // Return true if window close flag is set
-        bool should_close() { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
-        void should_close(bool flag) { return glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
+        bool should_close() const { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
+        void should_close(bool flag) { glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
+
+        // Return true if window was resized, reset to false if true 
+        bool was_resized_reset() { 
+            if( _changed_size ) {
+                _changed_size = false;
+                return true;
+            }
+            return false;
+        }
+
+
+
 
         // Set clear color
         void clear_color( float red, float green, float blue, float alpha=1.0 );
@@ -32,7 +48,16 @@ class Window {
         GLFWwindow* _glfw_window_ptr;
         std::shared_ptr<bool> _ref_counter;
 
+        unsigned int _width, _height;
+        bool _changed_size = true;
+
+
         static unsigned int _window_count;
+        static Window* _current_window;
+
+        
+        // callbacks
+        static void _glfw_framebuffer_size(GLFWwindow* window, int width, int height);
 };
 
 class WindowException : public std::exception {

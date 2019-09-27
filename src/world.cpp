@@ -3,14 +3,15 @@
 #include "spdlog/spdlog.h"
 
 World::World() {
-    Object root{};
-    _objects[_next_id] = root;
+    // root is the parent of itself
+    Object root{_next_id};
+    _objects.emplace( std::make_pair(_next_id, root) ) ;
     _root_id = _next_id++;
 }
 
 ObjectId World::create_object( ObjectId parent ) {
-    Object obj;
-    _objects[_next_id] = obj;
+    Object obj{ parent };
+    _objects.emplace( std::make_pair(_next_id, obj) ) ;
     get_object( parent ).add_child( _next_id );
     return _next_id++;
 }
@@ -39,6 +40,8 @@ void World::draw() const {
             } else {
                 obj._shader_program->uniform( "model_transform", glm::mat4{1.0} );
             }
+            /// TODO: optimize, should not set projection matrix so often
+            obj._shader_program->uniform( "proj_transform", _proj_matrix );
             obj._mesh->draw( *obj._shader_program );
         }
 
@@ -47,3 +50,4 @@ void World::draw() const {
         }
     }
 }
+

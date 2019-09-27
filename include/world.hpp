@@ -14,9 +14,11 @@ class World {
         ObjectId create_object( ObjectId parent );
         // Get reference to object
         Object& get_object( ObjectId obj_id );
-
         // Return the root object id
         ObjectId root() const;
+
+        // set projection matrix
+        void set_projection_matrix( glm::mat4 proj ) { _proj_matrix = proj; }
 
         // Draw world
         void draw() const;
@@ -24,6 +26,8 @@ class World {
         ObjectId _root_id;
         ObjectId _next_id = 0;
         std::unordered_map<ObjectId, Object> _objects;
+
+        glm::mat4 _proj_matrix;
 };
 
 

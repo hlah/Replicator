@@ -6,6 +6,7 @@
 #include "spdlog/spdlog.h"
 
 #include <string>
+#include <cmath>
 
 class Engine {
     public:
@@ -21,13 +22,19 @@ class Engine {
         // Setters
         void set_window_size(unsigned int width, unsigned int height);
         void set_window_title(const std::string& title);
+        void set_fov( float fov ) { _fov = fov; }
+        void set_near( float near ) { _near = near; }
+        void set_far( float far ) { _far = far; }
+
 
 
     private:
         bool _running;
-        unsigned int _width;
-        unsigned int _height;
+        unsigned int _width, _height;
         std::string _title;
+        float _fov =  M_PI / 3.0;
+        float _near = -0.1f;
+        float _far = -10.0f;
 
 #ifdef DEBUG
         spdlog::level::level_enum _loglevel = spdlog::level::debug;

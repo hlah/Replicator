@@ -23,6 +23,10 @@ class Object {
         std::optional<Mesh> _mesh;
         std::optional<ShaderProgram> _shader_program;
         std::optional<glm::mat4> _model_transform;
+        ObjectId _parent;
+
+        // private constructor (only World class can create objects)
+        Object( ObjectId parent ) : _parent{parent} {};
 
         // add child object
         void add_child( const ObjectId child ) { _children.push_back(child); }
