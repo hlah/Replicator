@@ -2,6 +2,7 @@
 #define _REPLICATOR_STATE_HPP_
 
 #include "world.hpp"
+#include "action.hpp"
 
 class State {
     public:
@@ -14,6 +15,7 @@ class State {
         virtual Transition on_start(World& world) { return Transition::NONE; }
         virtual Transition update() { return Transition::NONE; }
         virtual Transition on_close() { return Transition::QUIT; }
+        virtual Transition on_action( const ActionEvent& action ) { return Transition::NONE; }
 };
 
 

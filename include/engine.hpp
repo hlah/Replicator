@@ -2,6 +2,8 @@
 #define _REPLICATOR_ENGINE_HPP_
 
 #include "state.hpp"
+#include "keys.hpp"
+#include "window.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -26,15 +28,26 @@ class Engine {
         void set_near( float near ) { _near = near; }
         void set_far( float far ) { _far = far; }
 
+        ActionId get_action_id( const std::string& name );
+        void bind_key( Key key, ActionId action );
 
 
     private:
         bool _running;
         unsigned int _width, _height;
         std::string _title;
+
         float _fov =  M_PI / 3.0;
         float _near = -0.1f;
         float _far = -10.0f;
+
+        ActionId _next_action_id = 0;
+        std::unordered_map<ActionId, std::string> _actions;
+        std::unordered_map<Key, ActionId> _key_bindings;
+
+        // process actions
+        void _process_actions( Window& window, State* state_ptr );
+        void _process_transition( State::Transition trans );
 
 #ifdef DEBUG
         spdlog::level::level_enum _loglevel = spdlog::level::debug;

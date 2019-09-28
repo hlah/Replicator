@@ -1,10 +1,15 @@
 #ifndef _REPLICATOR_WINDOW_HPP_
 #define _REPLICATOR_WINDOW_HPP_
 
+
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
+#include "keys.hpp"
+
 #include <memory>
+#include <queue>
+#include <optional>
 
 class Window {
     public:
@@ -38,11 +43,11 @@ class Window {
             return false;
         }
 
-
-
-
         // Set clear color
         void clear_color( float red, float green, float blue, float alpha=1.0 );
+
+        // get next key
+        std::optional<std::pair<Key, KeyEventType>> next_key();
 
     private:
         GLFWwindow* _glfw_window_ptr;
@@ -51,13 +56,15 @@ class Window {
         unsigned int _width, _height;
         bool _changed_size = true;
 
-
         static unsigned int _window_count;
         static Window* _current_window;
 
+        // event queues
+        std::queue<std::pair<Key, KeyEventType>> _key_queue;
         
         // callbacks
-        static void _glfw_framebuffer_size(GLFWwindow* window, int width, int height);
+        static void _glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
+        static void _glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 class WindowException : public std::exception {

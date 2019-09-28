@@ -60,7 +60,8 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         spdlog::info("GLSL version: {}", glsl_version);
 
         // register window calbacks
-        glfwSetFramebufferSizeCallback( _glfw_window_ptr, Window::_glfw_framebuffer_size );
+        glfwSetFramebufferSizeCallback( _glfw_window_ptr, Window::_glfw_framebuffer_size_callback );
+        glfwSetKeyCallback( _glfw_window_ptr, Window::_glfw_key_callback );
         
 
         _ref_counter.reset(new bool);
@@ -93,12 +94,25 @@ void Window::clear_color( float red, float green, float blue, float alpha ) {
     glClearColor( red, green, blue, alpha );
 }
 
+std::optional<std::pair<Key, KeyEventType>> Window::next_key() {
+    std::optional<std::pair<Key, KeyEventType>> next;
+    if( !_key_queue.empty() ) {
+        next = _key_queue.front();
+        _key_queue.pop();
+    }
+    return next;
+}
+
 /// Window callbacks
-void Window::_glfw_framebuffer_size(GLFWwindow* window, int width, int height) {
+void Window::_glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     _current_window->_width = width;
     _current_window->_height = height;
     _current_window->_changed_size = true;
     glViewport( 0, 0, width, height );
+}
+
+void Window::_glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    _current_window->_key_queue.push( { (Key)key, (KeyEventType)action } );
 }
 
 /// Error callbacks

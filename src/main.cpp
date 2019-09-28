@@ -43,6 +43,17 @@ class MyState : public State {
             return State::Transition::NONE;
         }
 
+        virtual Transition on_action( const ActionEvent& action ) {
+            if( action.name() == "Jump" && action.type() == ActionEvent::Type::ON ) {
+                spdlog::info("Jumping!");
+            }
+            if( action.name() == "Close" && action.type() == ActionEvent::Type::ON ) {
+                return State::Transition::QUIT;
+            }
+
+            return State::Transition::NONE;
+        }
+
     private:
         int _counter = 3;
 };
@@ -52,6 +63,13 @@ int main() {
     auto engine = Engine{};
     engine.set_window_size(800, 600);
     engine.set_window_title("Replicator");
+
+    auto jump_action_id = engine.get_action_id( "Jump" );
+    engine.bind_key( Key::Space, jump_action_id );
+
+    auto close_action_id = engine.get_action_id( "Close" );
+    engine.bind_key( Key::Escape, close_action_id );
+
 
     MyState state;
 
