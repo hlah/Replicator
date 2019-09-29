@@ -3,6 +3,8 @@
 
 #include "glm/mat4x4.hpp"
 
+#include <string>
+
 // This header defines common matrix operations
 namespace matrix_op {
 
@@ -26,6 +28,9 @@ namespace matrix_op {
 
     // perspective projection matrix
     glm::mat4 perspective( float fov, float aspect_ratio, float near, float far ); 
+
+    // print matrix to string
+    std::string print( const glm::mat4& matrix );
 
 }
 

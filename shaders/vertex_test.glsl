@@ -7,8 +7,9 @@ out vec4 color_f;
 
 uniform mat4 model_transform;
 uniform mat4 proj_transform;
+uniform mat4 view_transform;
 
 void main() {
-    gl_Position = proj_transform * model_transform * vertice_in;
+    gl_Position = proj_transform * view_transform * model_transform * vertice_in;
     color_f = color_in;
 }

@@ -14,10 +14,16 @@ class Object {
     public:
         // set object mesh
         void set_mesh( Mesh mesh ) { _mesh = mesh; }
+        std::optional<Mesh>& get_mesh() { return _mesh; }
+        const std::optional<Mesh>& get_mesh() const { return _mesh; };
         // add shader program
         void set_shader_program( const ShaderProgram& program ) { _shader_program = program; }
+        std::optional<ShaderProgram>& get_shader_program() { return _shader_program; }
+        const std::optional<ShaderProgram>& get_shader_program() const { return _shader_program; };
         // set model transform
         void set_model_transform( const glm::mat4& transform ) { _model_transform = transform; }
+        std::optional<glm::mat4>& get_model_transform() { return _model_transform; }
+        const std::optional<glm::mat4>& get_model_transform() const { return _model_transform; };
     private:
         std::vector<ObjectId> _children;
         std::optional<Mesh> _mesh;

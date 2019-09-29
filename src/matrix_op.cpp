@@ -1,5 +1,7 @@
 #include "matrix_op.hpp"
 
+#include <sstream>
+
 namespace matrix_op {
 
     // matrix scale operation
@@ -63,6 +65,18 @@ namespace matrix_op {
         );
 
         return -M*P;
+    }
+
+    std::string print( const glm::mat4& matrix ) {
+        std::stringstream ss;
+        for( int i=0; i<4; i++ ) {
+            ss << "[";
+            for( int j=0; j<4; j++ ) {
+                ss << " " << matrix[j][i];
+            }
+            ss << " ]\n";
+        }
+        return ss.str();
     }
 
 }

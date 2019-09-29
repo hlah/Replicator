@@ -46,7 +46,7 @@ class Engine {
         std::unordered_map<Key, ActionId> _key_bindings;
 
         // process actions
-        void _process_actions( Window& window, State* state_ptr );
+        void _process_actions( Window& window, State* state_ptr, World& world );
         void _process_transition( State::Transition trans );
 
 #ifdef DEBUG

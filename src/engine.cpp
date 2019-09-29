@@ -20,7 +20,7 @@ void Engine::run(State* state_ptr) {
     while( _running ) {
         window.poll_events();
 
-        _process_actions( window, state_ptr );
+        _process_actions( window, state_ptr, world );
 
         // update projection matrix on window resize
         if( window.was_resized_reset() ) {
@@ -71,7 +71,7 @@ void Engine::bind_key( Key key, ActionId action ) {
     _key_bindings[key] = action;
 }
 
-void Engine::_process_actions( Window& window, State* state_ptr ) {
+void Engine::_process_actions( Window& window, State* state_ptr, World& world ) {
     // check for close event
     if( window.should_close() ) {
         auto transition = state_ptr->on_close();
@@ -86,14 +86,16 @@ void Engine::_process_actions( Window& window, State* state_ptr ) {
             // Key press -> action ON
             if( key_event->second == KeyEventType::Press ) {
                 auto transition = state_ptr->on_action( 
-                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _key_bindings.at( key_event->first ) ) } 
-                        );
+                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _key_bindings.at( key_event->first ) ) },
+                        world
+                );
                 _process_transition( transition );
             } 
             // Key release -> action OFF
             else if( key_event->second == KeyEventType::Release ) {
                 auto transition = state_ptr->on_action( 
-                    ActionEvent{ ActionEvent::Type::OFF, _actions.at( _key_bindings.at( key_event->first ) ) } 
+                    ActionEvent{ ActionEvent::Type::OFF, _actions.at( _key_bindings.at( key_event->first ) ) },
+                    world
                 );
                 _process_transition( transition );
             } 
