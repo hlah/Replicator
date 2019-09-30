@@ -61,29 +61,33 @@ class MyState : public State {
             if( action.name() == "Close" && action.type() == ActionEvent::Type::ON ) {
                 return State::Transition::QUIT;
             }
-            if( action.name() == "MoveLeft" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( _cam_id );
-                cam.set_model_transform( 
-                        matrix_op::translation( -1.0, 0.0, 0.0 ) * (*cam.get_model_transform())
-                );
+            if( action.name() == "MoveLeft" ) {
+                if( action.type() == ActionEvent::Type::ON ) {
+                    _horizontal_v -= _speed;
+                } else if( action.type() == ActionEvent::Type::OFF ) {
+                    _horizontal_v += _speed;
+                }
             }
-            if( action.name() == "MoveRight" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( _cam_id );
-                cam.set_model_transform( 
-                        matrix_op::translation( 1.0, 0.0, 0.0 ) * (*cam.get_model_transform())
-                );
+            if( action.name() == "MoveRight" ) {
+                if( action.type() == ActionEvent::Type::ON ) {
+                    _horizontal_v += _speed;
+                } else if( action.type() == ActionEvent::Type::OFF ) {
+                    _horizontal_v -= _speed;
+                }
             }
-            if( action.name() == "MoveForward" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( _cam_id );
-                cam.set_model_transform( 
-                        matrix_op::translation( 0.0, 0.0, -1.0 ) * (*cam.get_model_transform())
-                );
+            if( action.name() == "MoveForward" ) {
+                if( action.type() == ActionEvent::Type::ON ) {
+                    _transversal_v -= _speed;
+                } else if( action.type() == ActionEvent::Type::OFF ) {
+                    _transversal_v += _speed;
+                }
             }
-            if( action.name() == "MoveBackward" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( _cam_id );
-                cam.set_model_transform( 
-                        matrix_op::translation( 0.0, 0.0, 1.0 ) * (*cam.get_model_transform())
-                );
+            if( action.name() == "MoveBackward" ) {
+                if( action.type() == ActionEvent::Type::ON ) {
+                    _transversal_v += _speed;
+                } else if( action.type() == ActionEvent::Type::OFF ) {
+                    _transversal_v -= _speed;
+                }
             }
             if( action.name() == "RotCubeY" && action.type() == ActionEvent::Type::ON ) {
                 auto& obj = world.get_object( _obj_id );
@@ -106,10 +110,24 @@ class MyState : public State {
 
             return State::Transition::NONE;
         }
+        virtual Transition update( World& world, double delta_time ) {
+            auto& cam = world.get_object( _cam_id );
+            cam.set_model_transform( 
+                    matrix_op::translation( _horizontal_v*delta_time, 0.0, 0.0 ) * (*cam.get_model_transform())
+            );
+            cam.set_model_transform( 
+                    matrix_op::translation( 0.0, 0.0, _transversal_v*delta_time ) * (*cam.get_model_transform())
+            );
+            return State::Transition::NONE;
+        }
 
     private:
         ObjectId _cam_id;
         ObjectId _obj_id;
+
+        float _horizontal_v = 0.0;
+        float _transversal_v = 0.0;
+        const float _speed = 2.0;
 };
 
 int main() {

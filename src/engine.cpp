@@ -17,6 +17,7 @@ void Engine::run(State* state_ptr) {
     
     state_ptr->on_start( world );
 
+    double before = glfwGetTime();
     while( _running ) {
         window.poll_events();
 
@@ -32,7 +33,9 @@ void Engine::run(State* state_ptr) {
             );
         }
 
-        state_ptr->update();
+        double now = glfwGetTime();
+        state_ptr->update(world, now-before);
+        before = now;
 
         window.clear();
         world.draw();
