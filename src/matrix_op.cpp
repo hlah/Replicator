@@ -24,6 +24,37 @@ namespace matrix_op {
         return translation;
     }
 
+    glm::mat4 rotate_y( float angle ) {
+        auto s = std::sin( angle );
+        auto c = std::cos( angle );
+        return glm::mat4{
+              c, 0.f,  -s, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+              s, 0.f,   c, 0.f,
+            0.f, 0.f, 0.f, 1.f
+        };
+    }
+    glm::mat4 rotate_z( float angle ) {
+        auto s = std::sin( angle );
+        auto c = std::cos( angle );
+        return glm::mat4{
+              c,  -s, 0.f, 0.f,
+              s,   c, 0.f, 0.f,
+            0.f, 0.f, 1.f, 0.f,
+            0.f, 0.f, 0.f, 1.f
+        };
+    }
+    glm::mat4 rotate_x( float angle ) {
+        auto s = std::sin( angle );
+        auto c = std::cos( angle );
+        return glm::mat4{
+            1.f, 0.f, 0.f, 0.f,
+            0.f,   c,  -s, 0.f,
+            0.f,   s,   c, 0.f,
+            0.f, 0.f, 0.f, 1.f
+        };
+    }
+
     // orthographic projection matrix
     glm::mat4 orthographic( 
             float left, 

@@ -14,12 +14,21 @@ class MyState : public State {
     public:
         virtual Transition on_start(World &world) {
             MeshBuilder mb;
-            mb.add_vertex( 0.0, 0.5, 0.0 );
+            mb.cube( 1.0 );
+            //mb.add_vertex( 0.0, 0.5, 0.0 );
+            //mb.add_color( 1.0, 0.0, 0.0 );
+            //mb.add_vertex( 0.5, -0.5, 0.0 );
+            //mb.add_color( 0.0, 1.0, 0.0 );
+            //mb.add_vertex( -0.5, -0.5, 0.0 );
+            //mb.add_color( 0.0, 0.0, 1.0 );
             mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_vertex( 0.5, -0.5, 0.0 );
-            mb.add_color( 0.0, 1.0, 0.0 );
-            mb.add_vertex( -0.5, -0.5, 0.0 );
+            mb.add_color( 1.0, 0.0, 0.0 );
+            mb.add_color( 1.0, 0.5, 0.0 );
+            mb.add_color( 1.0, 0.5, 0.0 );
             mb.add_color( 0.0, 0.0, 1.0 );
+            mb.add_color( 0.0, 0.0, 1.0 );
+            mb.add_color( 0.0, 0.5, 1.0 );
+            mb.add_color( 0.0, 0.5, 1.0 );
             auto mesh = mb.build();
 
             std::ifstream vs_file( "../shaders/vertex_test.glsl" );
@@ -34,8 +43,8 @@ class MyState : public State {
 
             ShaderProgram program{vertex_shader, fragment_shader};
 
-            auto obj_id = world.create_object( world.root() );
-            auto& obj = world.get_object( obj_id );
+            _obj_id = world.create_object( world.root() );
+            auto& obj = world.get_object( _obj_id );
             obj.set_mesh( mesh );
             obj.set_shader_program( program );
             obj.set_model_transform( matrix_op::translation( 0.0, 0.0, -2.0 ) );
@@ -53,27 +62,45 @@ class MyState : public State {
                 return State::Transition::QUIT;
             }
             if( action.name() == "MoveLeft" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( 2 );
+                auto& cam = world.get_object( _cam_id );
                 cam.set_model_transform( 
                         matrix_op::translation( -1.0, 0.0, 0.0 ) * (*cam.get_model_transform())
                 );
             }
             if( action.name() == "MoveRight" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( 2 );
+                auto& cam = world.get_object( _cam_id );
                 cam.set_model_transform( 
                         matrix_op::translation( 1.0, 0.0, 0.0 ) * (*cam.get_model_transform())
                 );
             }
             if( action.name() == "MoveForward" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( 2 );
+                auto& cam = world.get_object( _cam_id );
                 cam.set_model_transform( 
                         matrix_op::translation( 0.0, 0.0, -1.0 ) * (*cam.get_model_transform())
                 );
             }
             if( action.name() == "MoveBackward" && action.type() == ActionEvent::Type::ON ) {
-                auto& cam = world.get_object( 2 );
+                auto& cam = world.get_object( _cam_id );
                 cam.set_model_transform( 
                         matrix_op::translation( 0.0, 0.0, 1.0 ) * (*cam.get_model_transform())
+                );
+            }
+            if( action.name() == "RotCubeY" && action.type() == ActionEvent::Type::ON ) {
+                auto& obj = world.get_object( _obj_id );
+                obj.set_model_transform( 
+                         (*obj.get_model_transform()) * matrix_op::rotate_y( 0.1f )
+                );
+            }
+            if( action.name() == "RotCubeZ" && action.type() == ActionEvent::Type::ON ) {
+                auto& obj = world.get_object( _obj_id );
+                obj.set_model_transform( 
+                         (*obj.get_model_transform()) * matrix_op::rotate_z( 0.1f )
+                );
+            }
+            if( action.name() == "RotCubeX" && action.type() == ActionEvent::Type::ON ) {
+                auto& obj = world.get_object( _obj_id );
+                obj.set_model_transform( 
+                         (*obj.get_model_transform()) * matrix_op::rotate_x( 0.1f )
                 );
             }
 
@@ -82,6 +109,7 @@ class MyState : public State {
 
     private:
         ObjectId _cam_id;
+        ObjectId _obj_id;
 };
 
 int main() {
@@ -98,6 +126,14 @@ int main() {
     engine.bind_key( Key::Up, forward_action_id );
     auto backward_action_id = engine.get_action_id( "MoveBackward" );
     engine.bind_key( Key::Down, backward_action_id );
+
+    auto rot_cube_y_action_id = engine.get_action_id( "RotCubeY" );
+    engine.bind_key( Key::Y, rot_cube_y_action_id );
+    auto rot_cube_z_action_id = engine.get_action_id( "RotCubeZ" );
+    engine.bind_key( Key::Z, rot_cube_z_action_id );
+    auto rot_cube_x_action_id = engine.get_action_id( "RotCubeX" );
+    engine.bind_key( Key::X, rot_cube_x_action_id );
+
 
     auto close_action_id = engine.get_action_id( "Close" );
     engine.bind_key( Key::Escape, close_action_id );

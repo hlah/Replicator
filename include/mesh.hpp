@@ -20,7 +20,7 @@ class Mesh {
         ~Mesh();
 
         // Draw mesh using program
-        void draw( const ShaderProgram progrma ) const;
+        void draw( const ShaderProgram program ) const;
 
     private:
         GLuint _index_buffer = 0;
@@ -37,6 +37,11 @@ class MeshBuilder {
         void add_vertex( float x, float y, float z, float w=1.0 );
         // Add color attribute
         void add_color( float r, float g, float b, float a=1.0 );
+        // Add index
+        void add_index( GLuint index );
+
+        // Add a cube with clockwise winding
+        void cube( float side );
 
         // Build mesh
         Mesh build();

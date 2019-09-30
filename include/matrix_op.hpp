@@ -14,6 +14,12 @@ namespace matrix_op {
 
     // matrix translation operation
     glm::mat4 translation( float tx, float ty, float tz );
+    
+    // matrix rotation operation
+    glm::mat4 rotate_y( float angle );
+    glm::mat4 rotate_z( float angle );
+    glm::mat4 rotate_x( float angle );
+
 
 
     // orthographic projection matrix
@@ -31,6 +37,7 @@ namespace matrix_op {
 
     // print matrix to string
     std::string print( const glm::mat4& matrix );
+
 
 }
 

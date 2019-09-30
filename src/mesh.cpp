@@ -69,7 +69,7 @@ Mesh::Mesh(
     }
 
     // create index array
-    _index_array_size = vertices.size();
+    _index_array_size = indices.size();
     auto index_array = new GLuint[_index_array_size];
     i = 0;
     for( const auto& index : indices ) {
@@ -111,6 +111,48 @@ void MeshBuilder::add_vertex( float x, float y, float z, float w ) {
 
 void MeshBuilder::add_color( float r, float g, float b, float a ) {
     _colors.push_back( glm::vec4( r, g, b, a ) );
+}
+
+void MeshBuilder::add_index( GLuint index ) {
+    _indices.push_back( index );
+}
+
+
+void MeshBuilder::cube( float side ) {
+    auto side_2 = side / 2.f;
+
+    // vertices
+    add_vertex( -side_2, side_2, side_2 );
+    add_vertex( side_2, side_2, side_2 );
+    add_vertex( side_2, -side_2, side_2 );
+    add_vertex( -side_2, -side_2, side_2 );
+
+    add_vertex( -side_2, side_2, -side_2 );
+    add_vertex( side_2, side_2, -side_2 );
+    add_vertex( side_2, -side_2, -side_2 );
+    add_vertex( -side_2, -side_2, -side_2 );
+
+    // indices
+    //FRONT
+    add_index(0); add_index(3); add_index(1);
+    add_index(3); add_index(2); add_index(1);
+    // BACK
+    add_index(4); add_index(5); add_index(6);
+    add_index(4); add_index(6); add_index(7);
+    // LEFT
+    add_index(0); add_index(4); add_index(7);
+    add_index(3); add_index(0); add_index(7);
+    // RIGHT
+    add_index(5); add_index(1); add_index(2);
+    add_index(6); add_index(5); add_index(2);
+    // TOP
+    add_index(4); add_index(0); add_index(5);
+    add_index(0); add_index(1); add_index(5);
+    // BOTTOM
+    add_index(7); add_index(2); add_index(3);
+    add_index(7); add_index(6); add_index(2);
+
+
 }
 
 Mesh MeshBuilder::build() {

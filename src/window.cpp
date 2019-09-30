@@ -50,6 +50,15 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback( opengl_error_callback, nullptr );
 
+        // enable and configure depth test
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
+        // enalbe culling
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);
         const GLubyte* gl_version = glGetString(GL_VERSION);
@@ -83,7 +92,7 @@ Window::~Window() {
 }
 
 void Window::clear() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::refresh() {
