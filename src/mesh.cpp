@@ -17,75 +17,51 @@ Mesh::Mesh(
 
     // create vertex array
     size_t vertex_array_size = vertices.size()*4;
-    auto vertex_array = new GLfloat[vertex_array_size];
-    size_t i = 0;
-    for( const auto& vertex : vertices ) {
-        vertex_array[i++] = vertex[0];
-        vertex_array[i++] = vertex[1];
-        vertex_array[i++] = vertex[2];
-        vertex_array[i++] = vertex[3];
-    }
     // Create vertex buffer
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vertex_array_size, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*vertex_array_size, vertex_array);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*vertex_array_size, vertices.data());
 
     // Bind to Vao
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    delete[] vertex_array;
     _vertex_buffer = vertex_buffer;
 
 
     // create color array
     if( colors.size() > 0 ) {
         size_t color_array_size = colors.size()*4;
-        auto color_array = new GLfloat[color_array_size];
-        size_t i = 0;
-        for( const auto& color : colors ) {
-            color_array[i++] = color[0];
-            color_array[i++] = color[1];
-            color_array[i++] = color[2];
-            color_array[i++] = color[3];
-        }
         // Create color buffer
         GLuint color_buffer;
         glGenBuffers(1, &color_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*color_array_size, NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*color_array_size, color_array);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*color_array_size, colors.data());
 
         // Bind to Vao
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        delete[] color_array;
         _color_buffer = color_buffer;
     }
 
     // create index array
     _index_array_size = indices.size();
-    auto index_array = new GLuint[_index_array_size];
-    i = 0;
-    for( const auto& index : indices ) {
-        index_array[i++] = index;
-    }
 
     // Create index buffer
     GLuint index_buffer;
     glGenBuffers(1, &index_buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*_index_array_size, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLfloat)*_index_array_size, index_array);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLfloat)*_index_array_size, indices.data());
 
 
     glBindVertexArray(0);
-    delete[] index_array;
     _index_buffer = vertex_buffer;
 
 }
