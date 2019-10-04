@@ -6,6 +6,8 @@
 
 #include "glm/mat4x4.hpp"
 
+#include "entt/entt.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <streambuf>

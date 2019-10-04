@@ -32,6 +32,9 @@ add_subdirectory(glfw)
 # spdlog
 add_subdirectory(spdlog)
 
+# EnTT
+add_subdirectory(entt)
+
 # Set warning and errors flags
 set(CMAKE_CXX_STANDARD 17)
 set(warnings "-Wall -Wextra -Werror -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=unused-but-set-variable")
@@ -48,6 +51,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog)
+target_link_libraries(${PROJECT_NAME} PUBLIC EnTT)
 
 
 
