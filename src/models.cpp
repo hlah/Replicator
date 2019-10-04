@@ -1,11 +1,14 @@
 #include "models.hpp"
 
+#include "transform.hpp"
+
 #include "spdlog/spdlog.h"
 
 // model system
 void model_system( entt::registry& registry ) {
-    auto view = registry.view<const Model>();
-    view.each([](const auto& model){
+    auto view = registry.view<Model, const Transform>();
+    view.each([](auto& model, const auto& transform){
+            model.program->uniform( "model_transform", transform.global );
             model.mesh.draw( *model.program );
     });
 }

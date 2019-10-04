@@ -2,6 +2,7 @@
 #include "state.hpp"
 #include "mesh.hpp"
 #include "models.hpp"
+#include "transform.hpp"
 
 #include "matrix_op.hpp"
 
@@ -35,6 +36,7 @@ class MyState : public State {
 
             auto triangle = registry.create();
             registry.assign<Model>( triangle, mesh, program_handle );
+            registry.assign<Transform>( triangle, matrix_op::translation( -0.5, 0.5, -1.0 ) );
 
             return State::Transition::NONE;
         }
@@ -47,6 +49,7 @@ class MyState : public State {
         }
 
         virtual Transition update( entt::registry& registry ) override {
+            transform_system( registry );
             model_system( registry );
             return State::Transition::NONE;
         }
