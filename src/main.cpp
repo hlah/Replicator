@@ -16,6 +16,8 @@
 class MyState : public State {
     public:
         virtual Transition on_start( entt::registry& registry ) override {
+            auto& program_cache = registry.set<entt::resource_cache<ShaderProgram>>();
+
             MeshBuilder mb;
             mb.add_vertex( 0.0, 0.5, 0.0 );
             mb.add_color( 1.0, 0.0, 0.0 );
@@ -25,20 +27,14 @@ class MyState : public State {
             mb.add_color( 0.0, 0.0, 1.0 );
             auto mesh = mb.build();
 
-            std::ifstream vs_file( "../shaders/vertex_test.glsl" );
-            std::string vs_source{ std::istreambuf_iterator<char>(vs_file), std::istreambuf_iterator<char>() };
-            vs_file.close();
-            Shader vertex_shader{Shader::Type::VERTEX, vs_source };
-
-            std::ifstream fs_file( "../shaders/fragment_test.glsl" );
-            std::string fs_source{ std::istreambuf_iterator<char>(fs_file), std::istreambuf_iterator<char>() };
-            fs_file.close();
-            Shader fragment_shader{Shader::Type::FRAGMENT, fs_source };
-
-            ShaderProgram program{vertex_shader, fragment_shader};
+            auto program_handle = program_cache.load<ShaderProgramLoader>(
+                    "shader_program"_hs, 
+                    "../shaders/vertex_test.glsl", 
+                    "../shaders/fragment_test.glsl" 
+            );
 
             auto triangle = registry.create();
-            registry.assign<Model>( triangle, mesh, program );
+            registry.assign<Model>( triangle, mesh, program_handle );
 
             return State::Transition::NONE;
         }

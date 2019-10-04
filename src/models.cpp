@@ -6,6 +6,6 @@
 void model_system( entt::registry& registry ) {
     auto view = registry.view<const Model>();
     view.each([](const auto& model){
-            model.mesh.draw( model.program );
+            model.mesh.draw( *model.program );
     });
 }

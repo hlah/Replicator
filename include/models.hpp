@@ -9,7 +9,7 @@
 // Model compoenent
 struct Model {
     Mesh mesh;
-    ShaderProgram program;
+    entt::resource_handle<ShaderProgram> program;
 };
 
 // model system

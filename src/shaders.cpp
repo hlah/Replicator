@@ -2,6 +2,8 @@
 
 #include "spdlog/spdlog.h"
 
+#include <fstream>
+
 // Shader class
 Shader::Shader(Shader::Type type, std::string& source) {
     GLuint shader_id = glCreateShader( (GLuint)type );
@@ -74,24 +76,54 @@ ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaders) {
         throw ShaderException{ std::string{"ShaderProgram link error:\n"} + log_info };
     }
 
-    _program_id_shared.reset(new GLuint{program_id});
-    spdlog::debug("Created shader program, id={}", *_program_id_shared);
+    _program_id = program_id;
+    spdlog::debug("Created shader program, id={}", _program_id);
 }
 
+/*
 ShaderProgram::~ShaderProgram() {
     if( _program_id_shared.unique() ) {
         glDeleteProgram( *_program_id_shared );
         spdlog::debug("Deleted shader program, id={}", *_program_id_shared);
     }
 }
+*/
 
 
 void ShaderProgram::use() const {
-    glUseProgram(*_program_id_shared);
+    glUseProgram(_program_id);
     // set pending uniforms
     while( !_uniforms_to_set.empty() ) {
         auto& uniform = _uniforms_to_set.back();
         glUniformMatrix4fv( uniform.location, 1, GL_FALSE, glm::value_ptr(uniform.value) );
         _uniforms_to_set.pop_back();
     }
+}
+
+std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::string& vs_filename, const std::string fs_filename ) const {
+    auto vs_source = _load_file( vs_filename );
+    auto fs_source = _load_file( fs_filename );
+    auto vs = Shader{ Shader::Type::VERTEX, vs_source };
+    auto fs = Shader{ Shader::Type::FRAGMENT, fs_source };
+
+    std::shared_ptr<ShaderProgram> program{ 
+        new ShaderProgram{ vs, fs } ,
+        ShaderProgramDeleter{}
+    };
+
+    return program;
+}
+
+std::string ShaderProgramLoader::_load_file( const std::string& path ) const {
+    std::ifstream file( path );
+    std::string source{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+    file.close();
+    return source;
+}
+
+
+void ShaderProgramDeleter::operator()(ShaderProgram* program) {
+    glDeleteProgram( program->_program_id );
+    spdlog::debug("Deleted shader program, id={}", program->_program_id);
+    delete program;
 }
