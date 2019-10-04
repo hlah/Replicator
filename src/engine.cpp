@@ -4,6 +4,8 @@
 #include "object.hpp"
 #include "matrix_op.hpp"
 
+#include "entt/entt.hpp"
+
 void Engine::run(State* state_ptr) {
     _running = true;
 
@@ -11,34 +13,27 @@ void Engine::run(State* state_ptr) {
 
     Window window{ _title, _width, _height };
 
-    spdlog::info("Running!");
+    entt::registry registry;
 
-    World world{};
+    spdlog::info("Running!");
     
-    state_ptr->on_start( world );
+    state_ptr->on_start( registry );
 
     double before = glfwGetTime();
     while( _running ) {
         window.poll_events();
 
-        _process_actions( window, state_ptr, world );
+        _process_actions( registry, window, state_ptr );
 
         // update projection matrix on window resize
         if( window.was_resized_reset() ) {
-            world.set_projection_matrix( 
-                    matrix_op::perspective(
-                    _fov, window.aspect_ratio(),
-                    _near, _far
-                )
-            );
         }
 
         double now = glfwGetTime();
-        state_ptr->update(world, now-before);
+        state_ptr->update( registry );
         before = now;
 
         window.clear();
-        world.draw();
         window.refresh();
     }
     spdlog::info("Stoped.");
@@ -74,10 +69,10 @@ void Engine::bind_key( Key key, ActionId action ) {
     _key_bindings[key] = action;
 }
 
-void Engine::_process_actions( Window& window, State* state_ptr, World& world ) {
+void Engine::_process_actions( entt::registry& registry, Window& window, State* state_ptr ) {
     // check for close event
     if( window.should_close() ) {
-        auto transition = state_ptr->on_close();
+        auto transition = state_ptr->on_close( registry );
         window.should_close(false);
         _process_transition( transition );
     }
@@ -89,16 +84,16 @@ void Engine::_process_actions( Window& window, State* state_ptr, World& world ) 
             // Key press -> action ON
             if( key_event->second == KeyEventType::Press ) {
                 auto transition = state_ptr->on_action( 
-                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _key_bindings.at( key_event->first ) ) },
-                        world
+                        registry,
+                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _key_bindings.at( key_event->first ) ) }
                 );
                 _process_transition( transition );
             } 
             // Key release -> action OFF
             else if( key_event->second == KeyEventType::Release ) {
                 auto transition = state_ptr->on_action( 
-                    ActionEvent{ ActionEvent::Type::OFF, _actions.at( _key_bindings.at( key_event->first ) ) },
-                    world
+                        registry,
+                        ActionEvent{ ActionEvent::Type::OFF, _actions.at( _key_bindings.at( key_event->first ) ) }
                 );
                 _process_transition( transition );
             } 

@@ -4,6 +4,8 @@
 #include "world.hpp"
 #include "action.hpp"
 
+#include "entt/entt.hpp"
+
 class State {
     public:
         // Type of transition for State
@@ -12,10 +14,10 @@ class State {
             QUIT,
         };
 
-        virtual Transition on_start(World& world) { return Transition::NONE; }
-        virtual Transition update( World& world, double delta_time ) { return Transition::NONE; }
-        virtual Transition on_close() { return Transition::QUIT; }
-        virtual Transition on_action( const ActionEvent& action, World& world ) { return Transition::NONE; }
+        virtual Transition on_start( entt::registry& registry ) { return Transition::NONE; }
+        virtual Transition update( entt::registry& registry ) { return Transition::NONE; }
+        virtual Transition on_close( entt::registry& registry ) { return Transition::QUIT; }
+        virtual Transition on_action( entt::registry& registry, const ActionEvent& action ) { return Transition::NONE; }
 };
 
 
