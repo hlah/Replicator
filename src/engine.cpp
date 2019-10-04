@@ -11,9 +11,8 @@ void Engine::run(State* state_ptr) {
 
     spdlog::set_level(_loglevel);
 
-    Window window{ _title, _width, _height };
-
     entt::registry registry;
+    registry.set<Window>( _title, _width, _height );
 
     spdlog::info("Running!");
     
@@ -21,19 +20,16 @@ void Engine::run(State* state_ptr) {
 
     double before = glfwGetTime();
     while( _running ) {
+        auto& window = registry.ctx<Window>();
         window.poll_events();
 
-        _process_actions( registry, window, state_ptr );
+        _process_actions( registry, state_ptr );
 
-        // update projection matrix on window resize
-        if( window.was_resized_reset() ) {
-        }
-
+        window.clear();
         double now = glfwGetTime();
         state_ptr->update( registry );
         before = now;
 
-        window.clear();
         window.refresh();
     }
     spdlog::info("Stoped.");
@@ -69,17 +65,17 @@ void Engine::bind_key( Key key, ActionId action ) {
     _key_bindings[key] = action;
 }
 
-void Engine::_process_actions( entt::registry& registry, Window& window, State* state_ptr ) {
+void Engine::_process_actions( entt::registry& registry, State* state_ptr ) {
     // check for close event
-    if( window.should_close() ) {
+    if( registry.ctx<Window>().should_close() ) {
         auto transition = state_ptr->on_close( registry );
-        window.should_close(false);
+        registry.ctx<Window>().should_close(false);
         _process_transition( transition );
     }
 
     // process input events
     std::optional<std::pair<Key, KeyEventType>> key_event;
-    while( (key_event = window.next_key()) ) {
+    while( (key_event = registry.ctx<Window>().next_key()) ) {
         if( _key_bindings.count( key_event->first ) != 0 ) {
             // Key press -> action ON
             if( key_event->second == KeyEventType::Press ) {
