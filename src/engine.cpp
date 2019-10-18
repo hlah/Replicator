@@ -11,8 +11,9 @@ void Engine::run(State* state_ptr) {
 
     spdlog::set_level(_loglevel);
 
-    Window window{ _title, _width, _height };
+    auto window = std::make_shared<Window>( _title, _width, _height );
     entt::registry registry;
+    registry.set<std::shared_ptr<Window>>( window );
 
     spdlog::info("Running!");
     
@@ -20,16 +21,17 @@ void Engine::run(State* state_ptr) {
 
     double before = glfwGetTime();
     while( _running ) {
-        window.poll_events();
+        window->poll_events();
 
-        _process_actions( registry, state_ptr, window );
+        _process_actions( registry, state_ptr, *window );
 
-        window.clear();
+        window->clear();
         double now = glfwGetTime();
         state_ptr->update( registry );
         before = now;
 
-        window.refresh();
+        window->refresh();
+        window->reset();
     }
     spdlog::info("Stoped.");
 }

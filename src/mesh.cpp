@@ -73,7 +73,7 @@ Mesh::~Mesh() {
     }
 }
 
-void Mesh::draw( const ShaderProgram program ) const {
+void Mesh::draw( const ShaderProgram& program ) const {
     program.use();
     glBindVertexArray(_vao);
     glDrawElements(GL_TRIANGLES, _index_array_size, GL_UNSIGNED_INT, (GLvoid*)0);

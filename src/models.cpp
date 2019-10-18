@@ -1,6 +1,7 @@
 #include "models.hpp"
 
 #include "transform.hpp"
+#include "camera.hpp"
 
 #include "spdlog/spdlog.h"
 

@@ -45,19 +45,13 @@ class ShaderProgram {
         // Set uniform value
         void uniform( const std::string name, const glm::mat4& value ) {
             auto location = glGetUniformLocation( _program_id, name.c_str() );
-            _uniforms_to_set.push_back( { location, value } );
+            _uniforms_to_set[ location ] = value;
         }
 
     private:
         GLuint _program_id;
 
-        // For uniform setting
-        struct uniform_pair {
-            GLint location;
-            glm::mat4 value;
-        };
-
-        mutable std::vector<uniform_pair> _uniforms_to_set;
+        mutable std::unordered_map<GLint, glm::mat4> _uniforms_to_set;
 
         friend class ShaderProgramDeleter;
 };

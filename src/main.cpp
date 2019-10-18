@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "models.hpp"
 #include "transform.hpp"
+#include "camera.hpp"
 
 #include "matrix_op.hpp"
 
@@ -22,10 +23,10 @@ class MyState : public State {
             MeshBuilder mb;
             mb.add_vertex( 0.0, 0.5, 0.0 );
             mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_vertex( 0.5, -0.5, 0.0 );
-            mb.add_color( 0.0, 1.0, 0.0 );
             mb.add_vertex( -0.5, -0.5, 0.0 );
             mb.add_color( 0.0, 0.0, 1.0 );
+            mb.add_vertex( 0.5, -0.5, 0.0 );
+            mb.add_color( 0.0, 1.0, 0.0 );
             auto mesh = mb.build();
 
             auto program_handle = program_cache.load<ShaderProgramLoader>(
@@ -34,9 +35,11 @@ class MyState : public State {
                     "../shaders/fragment_test.glsl" 
             );
 
-            auto triangle = registry.create();
-            registry.assign<Model>( triangle, mesh, program_handle );
-            registry.assign<Transform>( triangle, matrix_op::translation( -0.5, 0.5, -1.0 ) );
+            _triangle = registry.create();
+            registry.assign<Model>( _triangle, mesh, program_handle );
+            registry.assign<Transform>( _triangle, matrix_op::translation( 0.0, 0.0, -_s ) );
+
+            registry.set<Camera>( (float)M_PI/2.f, -0.1f, -10.0f );
 
             return State::Transition::NONE;
         }
@@ -49,10 +52,18 @@ class MyState : public State {
         }
 
         virtual Transition update( entt::registry& registry ) override {
+            _s += 0.01;
+            registry.get<Transform>(_triangle) = Transform{ matrix_op::translation( 0.0, 0.0, -_s ) };
+            //spdlog::debug("{}", _s);
+
             transform_system( registry );
+            camera_system( registry );
             model_system( registry );
             return State::Transition::NONE;
         }
+    private:
+        float _s = 1.0;
+        entt::entity _triangle{};
 };
 
 int main() {

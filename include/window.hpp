@@ -14,6 +14,8 @@
 class Window {
     public:
         Window(const std::string& title, unsigned int width, unsigned int height);
+        Window( Window&& other );
+        Window& operator=( Window&& other );
 
         ~Window();
 
@@ -34,13 +36,9 @@ class Window {
         bool should_close() const { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
         void should_close(bool flag) { glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
 
-        // Return true if window was resized, reset to false if true 
-        bool was_resized_reset() { 
-            if( _changed_size ) {
-                _changed_size = false;
-                return true;
-            }
-            return false;
+        // Return true if window was resized
+        bool resized() { 
+            return _changed_size;
         }
 
         // Set clear color
@@ -50,21 +48,33 @@ class Window {
         std::optional<std::pair<Key, KeyEventType>> next_key();
 
     private:
-        GLFWwindow* _glfw_window_ptr;
-        std::shared_ptr<bool> _ref_counter;
+        Window( const Window& other ) = delete;
+        Window& operator=( const Window& other ) = delete;
 
+        /// Private attributes ///
+        GLFWwindow* _glfw_window_ptr;
         unsigned int _width, _height;
         bool _changed_size = true;
-
-        static unsigned int _window_count;
-        static Window* _current_window;
-
         // event queues
         std::queue<std::pair<Key, KeyEventType>> _key_queue;
+
+        
+        /// Private methods ///
+
+        // reset flags
+        void reset() { _changed_size = false; }
+
+
+        /// Static variables ///
+        static unsigned int _window_count;
+        static Window* _current_window;
         
         // callbacks
         static void _glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
         static void _glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
+        friend class Engine;
 };
 
 class WindowException : public std::exception {

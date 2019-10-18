@@ -73,7 +73,6 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         glfwSetKeyCallback( _glfw_window_ptr, Window::_glfw_key_callback );
         
 
-        _ref_counter.reset(new bool);
         _window_count++;
         _current_window = this;
     } else {
@@ -81,8 +80,32 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
     }
 }
 
+Window::Window( Window&& other ) 
+    : _glfw_window_ptr{other._glfw_window_ptr},
+      _width{other._width},
+      _height{other._height},
+      _changed_size{other._changed_size},
+      _key_queue{other._key_queue}
+{
+    other._glfw_window_ptr = nullptr;
+    _current_window = this;
+}
+
+Window& Window::operator=( Window&& other ) {
+    _glfw_window_ptr = other._glfw_window_ptr;
+    _width = other._width;
+    _height = other._height;
+    _changed_size = other._changed_size;
+    _key_queue = other._key_queue;
+
+    other._glfw_window_ptr = nullptr;
+
+    _current_window = this;
+    return *this;
+}
+
 Window::~Window() {
-    if( _ref_counter.unique() ) {
+    if( _glfw_window_ptr != nullptr ) {
         glfwDestroyWindow(_glfw_window_ptr);
         spdlog::debug("Destroyed window.");
         glfwTerminate();

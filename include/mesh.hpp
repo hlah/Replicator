@@ -20,7 +20,7 @@ class Mesh {
         ~Mesh();
 
         // Draw mesh using program
-        void draw( const ShaderProgram program ) const;
+        void draw( const ShaderProgram& program ) const;
 
     private:
         GLuint _index_buffer = 0;

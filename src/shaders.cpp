@@ -1,5 +1,7 @@
 #include "shaders.hpp"
 
+#include "matrix_op.hpp"
+
 #include "spdlog/spdlog.h"
 
 #include <fstream>
@@ -93,11 +95,10 @@ ShaderProgram::~ShaderProgram() {
 void ShaderProgram::use() const {
     glUseProgram(_program_id);
     // set pending uniforms
-    while( !_uniforms_to_set.empty() ) {
-        auto& uniform = _uniforms_to_set.back();
-        glUniformMatrix4fv( uniform.location, 1, GL_FALSE, glm::value_ptr(uniform.value) );
-        _uniforms_to_set.pop_back();
+    for( auto& uniform : _uniforms_to_set ) {
+        glUniformMatrix4fv( uniform.first, 1, GL_FALSE, glm::value_ptr(uniform.second) );
     }
+    _uniforms_to_set.clear();
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::string& vs_filename, const std::string fs_filename ) const {
