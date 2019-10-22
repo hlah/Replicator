@@ -67,8 +67,11 @@ class MyState : public State {
             registry.assign<Transform>( _forearm, matrix_op::translation(0.0, 0.5, 0.0) * matrix_op::scale( 0.4, 2.0, 0.4 ) );
             registry.assign<Hierarchy>( _forearm, _forearm_level );
 
-
-            registry.set<Camera>( (float)M_PI/2.f, -0.1f, -10.0f );
+            _camera = registry.create();
+            registry.assign<Camera>( _camera, (float)M_PI/2.f, -0.1f, -10.0f );
+            registry.assign<Transform>( _camera, matrix_op::translation(0.0, 0.0, 5.0) );
+            registry.assign<Hierarchy>( _camera );
+            registry.set<CurrentCamera>( _camera );
 
             return State::Transition::NONE;
         }
@@ -109,6 +112,22 @@ class MyState : public State {
                     _forearm_rotation += _forearm_rotation_speed;
                 }
             }
+            if( action.name() == "CameraMoveH" ) {
+                if ( action.type() == ActionEvent::Type::ON  ) {
+                    _cam_horizontal_v += _cam_speed;
+                }
+                if ( action.type() == ActionEvent::Type::OFF  ) {
+                    _cam_horizontal_v -= _cam_speed;
+                }
+            }
+            if( action.name() == "CameraMoveHInv" ) {
+                if ( action.type() == ActionEvent::Type::ON  ) {
+                    _cam_horizontal_v -= _cam_speed;
+                }
+                if ( action.type() == ActionEvent::Type::OFF  ) {
+                    _cam_horizontal_v += _cam_speed;
+                }
+            }
             return State::Transition::NONE;
         }
 
@@ -123,6 +142,12 @@ class MyState : public State {
                 * matrix_op::rotate_z( _forearm_rotation );
             registry.replace<Transform>( _forearm_level, new_forearm_transform );
 
+            auto new_camera_transform
+                = matrix_op::translation( _cam_horizontal_v, 0.0, 0.0 )
+                * registry.get<Transform>( _camera ).local;
+            registry.replace<Transform>( _camera, new_camera_transform );
+
+
 
             transform_system( registry );
             camera_system( registry );
@@ -131,6 +156,7 @@ class MyState : public State {
             return State::Transition::NONE;
         }
     private:
+        entt::entity _camera;
         entt::entity _machine, _base, _arm_level, _arm, _forearm_level, _forearm;
 
         const float _arm_rotation_speed = 0.05;
@@ -138,6 +164,9 @@ class MyState : public State {
 
         const float _forearm_rotation_speed = 0.05;
         float _forearm_rotation = 0.0;
+
+        const float _cam_speed = 0.1;
+        float _cam_horizontal_v = 0.0;
 };
 
 int main() {
@@ -148,6 +177,7 @@ int main() {
 
     auto close_action_id = engine.get_action_id( "Close" );
     engine.bind_key( Key::Escape, close_action_id );
+
     auto rotate_arm_action_id  = engine.get_action_id( "RotateArm" );
     engine.bind_key( Key::A, rotate_arm_action_id );
     auto rotate_arm_inv_action_id  = engine.get_action_id( "RotateArmInv" );
@@ -156,6 +186,11 @@ int main() {
     engine.bind_key( Key::S, rotate_forearm_action_id );
     auto rotate_forearm_inv_action_id  = engine.get_action_id( "RotateForeArmInv" );
     engine.bind_key( Key::W, rotate_forearm_inv_action_id );
+
+    auto move_camera_h_action_id  = engine.get_action_id( "CameraMoveH" );
+    engine.bind_key( Key::Right, move_camera_h_action_id );
+    auto move_camera_hinv_action_id  = engine.get_action_id( "CameraMoveHInv" );
+    engine.bind_key( Key::Left, move_camera_hinv_action_id );
 
     MyState state;
     engine.run(&state);

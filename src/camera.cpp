@@ -2,6 +2,7 @@
 
 #include "models.hpp"
 #include "window.hpp"
+#include "transform.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -15,22 +16,34 @@ void Camera::set_aspect_ratio( float aspect_ratio ) {
 }
 
 void camera_system( entt::registry& registry ) {
-    auto view = registry.view<Model>();
-    auto camera_ptr = registry.try_ctx<Camera>();
-    auto window = registry.ctx<std::shared_ptr<Window>>();
-    if( camera_ptr != nullptr ) {
-        if( window->resized() ) {
-            camera_ptr->set_aspect_ratio( window->aspect_ratio() );
+    auto current_camera_ptr = registry.try_ctx<CurrentCamera>();
+    if( current_camera_ptr != nullptr ) {
+        auto camera_ptr = registry.try_get<Camera>( current_camera_ptr->entity );
+        if( camera_ptr != nullptr ) {
+            auto view = registry.view<Model>();
+            auto window = registry.ctx<std::shared_ptr<Window>>();
+            // Reset projection matrix on window resize
+            if( window->resized() ) {
+                camera_ptr->set_aspect_ratio( window->aspect_ratio() );
+            }
+            // Get view matrix
+            glm::mat4 view_matrix{1.0};
+            auto camera_transform_ptr = registry.try_get<Transform>( current_camera_ptr->entity );
+            if( camera_transform_ptr != nullptr ) {
+                spdlog::debug("View Matrix:\n{}", matrix_op::print( camera_transform_ptr->global ));
+                view_matrix = glm::inverse( camera_transform_ptr->global );
+            }
+            // TODO Optimization: update matrices only once for each shader program (from a model)
+            view.each([camera_ptr,&view_matrix](auto& model){
+                    model.program->uniform( "projection_transform", camera_ptr->projection_matrix );
+                    model.program->uniform( "view_transform", view_matrix );
+            });
+        } 
+        else {
+            spdlog::warn("Camera entity with no Camera component!");
         }
-        // TODO: update projectino matrix only once for each shader program (from a model)
-        view.each([camera_ptr](auto& model){
-                model.program->uniform( "projection_transform", camera_ptr->projection_matrix );
-        });
     } else {
-        view.each([](auto& model){
-                spdlog::warn("No camera set!");
-                model.program->uniform( "projection_transform", glm::mat4{1.0} );
-        });
+        spdlog::warn("No camera set!");
     }
 }
 
