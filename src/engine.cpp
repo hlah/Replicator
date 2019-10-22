@@ -3,6 +3,7 @@
 #include "state.hpp"
 #include "object.hpp"
 #include "matrix_op.hpp"
+#include "hierarchy.hpp"
 
 #include "entt/entt.hpp"
 
@@ -14,6 +15,10 @@ void Engine::run(State* state_ptr) {
     auto window = std::make_shared<Window>( _title, _width, _height );
     entt::registry registry;
     registry.set<std::shared_ptr<Window>>( window );
+
+    // watch for hierarchy changes
+    registry.on_construct<Hierarchy>().connect<&Hierarchy::on_construct>();
+    registry.on_destroy<Hierarchy>().connect<&Hierarchy::on_destroy>();
 
     spdlog::info("Running!");
     
