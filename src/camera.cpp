@@ -30,8 +30,7 @@ void camera_system( entt::registry& registry ) {
             glm::mat4 view_matrix{1.0};
             auto camera_transform_ptr = registry.try_get<Transform>( current_camera_ptr->entity );
             if( camera_transform_ptr != nullptr ) {
-                spdlog::debug("View Matrix:\n{}", matrix_op::print( camera_transform_ptr->global ));
-                view_matrix = glm::inverse( camera_transform_ptr->global );
+                view_matrix = glm::inverse( camera_transform_ptr->global_matrix() );
             }
             // TODO Optimization: update matrices only once for each shader program (from a model)
             view.each([camera_ptr,&view_matrix](auto& model){
