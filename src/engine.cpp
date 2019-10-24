@@ -67,7 +67,8 @@ ActionId Engine::get_action_id( const std::string& name ) {
     }
 }
 
-void Engine::bind_key( Key key, ActionId action ) {
+void Engine::bind_key( Key key, const std::string& action_name ) {
+    auto action = get_action_id( action_name );
     _key_bindings[key] = action;
 }
 

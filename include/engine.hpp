@@ -26,7 +26,7 @@ class Engine {
         void set_window_title(const std::string& title);
 
         ActionId get_action_id( const std::string& name );
-        void bind_key( Key key, ActionId action );
+        void bind_key( Key key, const std::string& action_name );
 
 
     private:

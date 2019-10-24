@@ -273,37 +273,24 @@ int main() {
     engine.set_window_size(800, 600);
     engine.set_window_title("Replicator");
 
-    auto close_action_id = engine.get_action_id( "Close" );
-    engine.bind_key( Key::Escape, close_action_id );
+    engine.bind_key( Key::Escape, "Close" );
 
-    auto rotate_arm_action_id  = engine.get_action_id( "RotateArm" );
-    engine.bind_key( Key::A, rotate_arm_action_id );
-    auto rotate_arm_inv_action_id  = engine.get_action_id( "RotateArmInv" );
-    engine.bind_key( Key::D, rotate_arm_inv_action_id );
-    auto rotate_forearm_action_id  = engine.get_action_id( "RotateForeArm" );
-    engine.bind_key( Key::S, rotate_forearm_action_id );
-    auto rotate_forearm_inv_action_id  = engine.get_action_id( "RotateForeArmInv" );
-    engine.bind_key( Key::W, rotate_forearm_inv_action_id );
+    engine.bind_key( Key::A, "RotateArm" );
+    engine.bind_key( Key::D, "RotateArmInv" );
+    engine.bind_key( Key::S, "RotateForeArm" );
+    engine.bind_key( Key::W, "RotateForeArmInv" );
 
-    auto move_camera_right_action_id  = engine.get_action_id( "CameraMoveRight" );
-    engine.bind_key( Key::KeyPad6, move_camera_right_action_id );
-    auto move_camera_left_action_id  = engine.get_action_id( "CameraMoveLeft" );
-    engine.bind_key( Key::KeyPad4, move_camera_left_action_id );
+    engine.bind_key( Key::KeyPad6, "CameraMoveRight" );
+    engine.bind_key( Key::KeyPad4, "CameraMoveLeft" );
 
-    auto move_camera_forward_action_id  = engine.get_action_id( "CameraMoveForward" );
-    engine.bind_key( Key::KeyPad8, move_camera_forward_action_id );
-    auto move_camera_backward_action_id  = engine.get_action_id( "CameraMoveBackward" );
-    engine.bind_key( Key::KeyPad2, move_camera_backward_action_id );
+    engine.bind_key( Key::KeyPad8, "CameraMoveForward" );
+    engine.bind_key( Key::KeyPad2, "CameraMoveBackward" );
 
-    auto rotate_camera_right_action_id  = engine.get_action_id( "CameraRotateRight" );
-    engine.bind_key( Key::KeyPad3, rotate_camera_right_action_id );
-    auto rotate_camera_left_action_id  = engine.get_action_id( "CameraRotateLeft" );
-    engine.bind_key( Key::KeyPad1, rotate_camera_left_action_id );
+    engine.bind_key( Key::KeyPad3, "CameraRotateRight" );
+    engine.bind_key( Key::KeyPad1, "CameraRotateLeft" );
 
-    auto rotate_camera_up_action_id  = engine.get_action_id( "CameraRotateUp" );
-    engine.bind_key( Key::Up, rotate_camera_up_action_id );
-    auto rotate_camera_down_action_id  = engine.get_action_id( "CameraRotateDown" );
-    engine.bind_key( Key::Down, rotate_camera_down_action_id );
+    engine.bind_key( Key::Up, "CameraRotateUp" );
+    engine.bind_key( Key::Down, "CameraRotateDown" );
 
     MyState state;
     engine.run(&state);
