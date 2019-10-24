@@ -18,6 +18,7 @@ class State {
         virtual Transition update( entt::registry& registry ) { return Transition::NONE; }
         virtual Transition on_close( entt::registry& registry ) { return Transition::QUIT; }
         virtual Transition on_action( entt::registry& registry, const ActionEvent& action ) { return Transition::NONE; }
+        virtual Transition on_mouse_move( entt::registry& registry, double mouse_x, double mouse_y ) { return Transition::NONE; }
 };
 
 

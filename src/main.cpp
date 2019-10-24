@@ -118,6 +118,14 @@ class MyState : public State {
             registry.assign<Hierarchy>( _camera, _player );
             registry.set<CurrentCamera>( _camera );
 
+            // Set previous mouse position
+            auto window = registry.ctx<std::shared_ptr<Window>>();
+            _new_mouse_x = _prev_mouse_x = window->mouse_x();
+            _new_mouse_y = _prev_mouse_y = window->mouse_y();
+
+            // Set mouse capture mode
+            window->capture_mouse(true);
+
             return State::Transition::NONE;
         }
 
@@ -125,106 +133,30 @@ class MyState : public State {
             if( action.name() == "Close" && action.type() == ActionEvent::Type::ON ) {
                 return State::Transition::QUIT;
             }
-            if( action.name() == "RotateArm" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _arm_rotation += _arm_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _arm_rotation -= _arm_rotation_speed;
-                }
-            }
-            if( action.name() == "RotateArmInv" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _arm_rotation -= _arm_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _arm_rotation += _arm_rotation_speed;
-                }
-            }
-            if( action.name() == "RotateForeArm" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _forearm_rotation += _forearm_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _forearm_rotation -= _forearm_rotation_speed;
-                }
-            }
-            if( action.name() == "RotateForeArmInv" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _forearm_rotation -= _forearm_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _forearm_rotation += _forearm_rotation_speed;
-                }
-            }
-            if( action.name() == "CameraMoveRight" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_horizontal_v += _player_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_horizontal_v -= _player_speed;
-                }
-            }
-            if( action.name() == "CameraMoveLeft" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_horizontal_v -= _player_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_horizontal_v += _player_speed;
-                }
-            }
-            if( action.name() == "CameraMoveForward" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_transversal_v -= _player_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_transversal_v += _player_speed;
-                }
-            }
-            if( action.name() == "CameraMoveBackward" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_transversal_v += _player_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_transversal_v -= _player_speed;
-                }
-            }
-            if( action.name() == "CameraRotateRight" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_y_rotation -= _player_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_y_rotation += _player_rotation_speed;
-                }
-            }
-            if( action.name() == "CameraRotateLeft" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _player_y_rotation += _player_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _player_y_rotation -= _player_rotation_speed;
-                }
-            }
-            if( action.name() == "CameraRotateUp" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _cam_x_rotation -= _player_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _cam_x_rotation += _player_rotation_speed;
-                }
-            }
-            if( action.name() == "CameraRotateDown" ) {
-                if ( action.type() == ActionEvent::Type::ON  ) {
-                    _cam_x_rotation += _player_rotation_speed;
-                }
-                if ( action.type() == ActionEvent::Type::OFF  ) {
-                    _cam_x_rotation -= _player_rotation_speed;
-                }
-            }
+
+            handle_action( action, "RotateArm", _arm_rotation, _arm_rotation_speed );
+            handle_action( action, "RotateArmInv", _arm_rotation, -_arm_rotation_speed );
+            handle_action( action, "RotateForeArm", _forearm_rotation, _forearm_rotation_speed );
+            handle_action( action, "RotateForeArmInv", _forearm_rotation, -_forearm_rotation_speed );
+
+            handle_action( action, "CameraMoveRight", _player_horizontal_v, _player_speed );
+            handle_action( action, "CameraMoveLeft", _player_horizontal_v, -_player_speed );
+            handle_action( action, "CameraMoveForward", _player_transversal_v, -_player_speed );
+            handle_action( action, "CameraMoveBackward", _player_transversal_v, _player_speed );
+
+            return State::Transition::NONE;
+        }
+
+        virtual Transition on_mouse_move( entt::registry& registry, double mx, double my ) override {
+            _new_mouse_x = mx;
+            _new_mouse_y = my;
             return State::Transition::NONE;
         }
 
         virtual Transition update( entt::registry& registry ) override {
+            _cam_x_rotation = -(_new_mouse_y-_prev_mouse_y)*_player_rotation_speed;
+            _player_y_rotation = -(_new_mouse_x-_prev_mouse_x)*_player_rotation_speed;
+
             auto new_arm_transform = registry.get<Transform>( _arm_level );
             new_arm_transform.rotate_y( _arm_rotation );
             registry.replace<Transform>( _arm_level, new_arm_transform );
@@ -246,9 +178,24 @@ class MyState : public State {
             camera_system( registry );
             model_system( registry );
 
+            _prev_mouse_x = _new_mouse_x;
+            _prev_mouse_y = _new_mouse_y;
+
             return State::Transition::NONE;
         }
     private:
+        // Helper function for action that edit float values
+        void handle_action( ActionEvent action, const std::string& action_name, float& value_to_edit, float value ) {
+            if( action.name() == action_name) {
+                if ( action.type() == ActionEvent::Type::ON  ) {
+                    value_to_edit += value;
+                }
+                if ( action.type() == ActionEvent::Type::OFF  ) {
+                    value_to_edit -= value;
+                }
+            }
+        }
+
         entt::entity _player, _camera;
         entt::entity _machine, _base, _arm_level, _arm, _forearm_level, _forearm;
 
@@ -258,13 +205,16 @@ class MyState : public State {
         const float _forearm_rotation_speed = 0.05;
         float _forearm_rotation = 0.0;
 
-        const float _player_rotation_speed = 0.05;
+        const float _player_rotation_speed = 0.005;
         float _player_y_rotation = 0.0;
         float _cam_x_rotation = 0.0;
 
         const float _player_speed = 0.1;
         float _player_horizontal_v = 0.0;
         float _player_transversal_v = 0.0;
+
+        double _prev_mouse_x, _prev_mouse_y;
+        double _new_mouse_x, _new_mouse_y;
 };
 
 int main() {
@@ -280,17 +230,10 @@ int main() {
     engine.bind_key( Key::S, "RotateForeArm" );
     engine.bind_key( Key::W, "RotateForeArmInv" );
 
-    engine.bind_key( Key::KeyPad6, "CameraMoveRight" );
-    engine.bind_key( Key::KeyPad4, "CameraMoveLeft" );
-
-    engine.bind_key( Key::KeyPad8, "CameraMoveForward" );
-    engine.bind_key( Key::KeyPad2, "CameraMoveBackward" );
-
-    engine.bind_key( Key::KeyPad3, "CameraRotateRight" );
-    engine.bind_key( Key::KeyPad1, "CameraRotateLeft" );
-
-    engine.bind_key( Key::Up, "CameraRotateUp" );
-    engine.bind_key( Key::Down, "CameraRotateDown" );
+    engine.bind_key( Key::Right, "CameraMoveRight" );
+    engine.bind_key( Key::Left, "CameraMoveLeft" );
+    engine.bind_key( Key::Up, "CameraMoveForward" );
+    engine.bind_key( Key::Down, "CameraMoveBackward" );
 
     MyState state;
     engine.run(&state);

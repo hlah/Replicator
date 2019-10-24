@@ -32,6 +32,11 @@ class Window {
         unsigned int height() const { return _height; }
         float aspect_ratio() const { return (float)_width/_height; }
 
+        float mouse_x() const { return _mouse_x; };
+        float mouse_y() const { return _mouse_y; };
+
+        void capture_mouse(bool value); 
+
         // Return true if window close flag is set
         bool should_close() const { return glfwWindowShouldClose(_glfw_window_ptr) == 1; }
         void should_close(bool flag) { glfwSetWindowShouldClose(_glfw_window_ptr, (int)flag); }
@@ -39,6 +44,11 @@ class Window {
         // Return true if window was resized
         bool resized() { 
             return _changed_size;
+        }
+
+        // Return true if mouse has moved
+        bool mouse_moved() const {
+            return _mouse_moved;
         }
 
         // Set clear color
@@ -55,6 +65,10 @@ class Window {
         GLFWwindow* _glfw_window_ptr;
         unsigned int _width, _height;
         bool _changed_size = true;
+
+        float _mouse_x, _mouse_y;
+        bool _mouse_moved = false;
+
         // event queues
         std::queue<std::pair<Key, KeyEventType>> _key_queue;
 
@@ -62,7 +76,7 @@ class Window {
         /// Private methods ///
 
         // reset flags
-        void reset() { _changed_size = false; }
+        void reset() { _changed_size = false; _mouse_moved = false; }
 
 
         /// Static variables ///
@@ -72,6 +86,7 @@ class Window {
         // callbacks
         static void _glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
         static void _glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void _glfw_mouse_pos_callback(GLFWwindow* window, double xpos, double ypos);
 
 
         friend class Engine;

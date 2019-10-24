@@ -22,12 +22,16 @@ void Engine::run(State* state_ptr) {
 
     spdlog::info("Running!");
     
+    window->poll_events();
     state_ptr->on_start( registry );
 
     double before = glfwGetTime();
     while( _running ) {
         window->poll_events();
 
+        if( window->mouse_moved() ) {
+            state_ptr->on_mouse_move( registry, window->mouse_x(), window->mouse_y() ) ;
+        }
         _process_actions( registry, state_ptr, *window );
 
         window->clear();

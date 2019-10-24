@@ -71,7 +71,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         // register window calbacks
         glfwSetFramebufferSizeCallback( _glfw_window_ptr, Window::_glfw_framebuffer_size_callback );
         glfwSetKeyCallback( _glfw_window_ptr, Window::_glfw_key_callback );
-        
+        glfwSetCursorPosCallback( _glfw_window_ptr, Window::_glfw_mouse_pos_callback );
 
         _window_count++;
         _current_window = this;
@@ -114,6 +114,14 @@ Window::~Window() {
     }
 }
 
+void Window::capture_mouse(bool value) { 
+    if( value ) {
+        glfwSetInputMode(_glfw_window_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    } else {
+        glfwSetInputMode(_glfw_window_ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+}
+
 void Window::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -145,6 +153,12 @@ void Window::_glfw_framebuffer_size_callback(GLFWwindow* window, int width, int 
 
 void Window::_glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     _current_window->_key_queue.push( { (Key)key, (KeyEventType)action } );
+}
+
+void Window::_glfw_mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+    _current_window->_mouse_x = xpos;
+    _current_window->_mouse_y = ypos;
+    _current_window->_mouse_moved = true;
 }
 
 /// Error callbacks
