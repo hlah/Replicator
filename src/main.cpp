@@ -215,6 +215,7 @@ int main() {
     auto engine = Engine{};
     engine.set_window_size(800, 600);
     engine.set_window_title("Replicator");
+    engine.set_aa(16);
 
     engine.bind_key( Key::Escape, "Close" );
 

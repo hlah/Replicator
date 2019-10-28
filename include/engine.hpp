@@ -24,6 +24,7 @@ class Engine {
         // Setters
         void set_window_size(unsigned int width, unsigned int height);
         void set_window_title(const std::string& title);
+        void set_aa(unsigned int aa) { _aa = aa; };
 
         ActionId get_action_id( const std::string& name );
         void bind_key( Key key, const std::string& action_name );
@@ -31,7 +32,7 @@ class Engine {
 
     private:
         bool _running;
-        unsigned int _width, _height;
+        unsigned int _width, _height, _aa = 0;
         std::string _title;
 
         ActionId _next_action_id = 0;

@@ -15,7 +15,7 @@ void GLAPIENTRY opengl_error_callback(
         const void* user_param
 );
 
-Window::Window(const std::string& title, unsigned int width, unsigned int height) 
+Window::Window(const std::string& title, unsigned int width, unsigned int height, unsigned int aa) 
     : _width{width}, _height{height}
 {
     if( _window_count == 0 ) {
@@ -26,6 +26,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
             throw WindowException{"Could not load init GLFW!"};
         }
         spdlog::info("Initialized GLFW.");
+        glfwWindowHint(GLFW_SAMPLES, aa);
         _glfw_window_ptr = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
         if (!_glfw_window_ptr) 
         {
@@ -58,6 +59,11 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
+
+        // anti-aliasing
+        if( aa > 0 ) {
+            glEnable(GL_MULTISAMPLE);
+        }
 
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);

@@ -13,7 +13,7 @@
 
 class Window {
     public:
-        Window(const std::string& title, unsigned int width, unsigned int height);
+        Window(const std::string& title, unsigned int width, unsigned int height, unsigned int aa=0);
         Window( Window&& other );
         Window& operator=( Window&& other );
 

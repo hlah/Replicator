@@ -12,7 +12,7 @@ void Engine::run(State* state_ptr) {
 
     spdlog::set_level(_loglevel);
 
-    auto window = std::make_shared<Window>( _title, _width, _height );
+    auto window = std::make_shared<Window>( _title, _width, _height, _aa );
     entt::registry registry;
     registry.set<std::shared_ptr<Window>>( window );
 
