@@ -5,6 +5,7 @@
 #include "transform.hpp"
 #include "camera.hpp"
 #include "hierarchy.hpp"
+#include "material.hpp"
 
 #include "matrix_op.hpp"
 
@@ -23,41 +24,11 @@ class MyState : public State {
 
             MeshBuilder mb;
             mb.cube( 1.0 );
-            mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_color( 0.0, 0.0, 1.0 );
-            mb.add_color( 0.0, 0.0, 1.0 );
-            mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_color( 1.0, 0.0, 0.0 );
-            mb.add_color( 0.0, 0.0, 1.0 );
-            mb.add_color( 0.0, 0.0, 1.0 );
-            mb.add_color( 1.0, 0.0, 0.0 );
             auto mesh = mb.build();
 
             MeshBuilder mb2;
-            mb2.add_vertex( -1.0, 0.0, -1.0 );
-            mb2.add_vertex( 1.0, 0.0, -1.0 );
-            mb2.add_vertex( 1.0, 0.0, 1.0 );
-            mb2.add_vertex( -1.0, 0.0, 1.0 );
-            mb2.add_color( 0.0, 0.8, 0.0 );
-            mb2.add_color( 0.0, 0.8, 0.0 );
-            mb2.add_color( 0.0, 0.8, 0.0 );
-            mb2.add_color( 0.0, 0.8, 0.0 );
-            mb2.add_index( 0 ); mb2.add_index( 2 ); mb2.add_index( 1 );
-            mb2.add_index( 3 ); mb2.add_index( 2 ); mb2.add_index( 0 );
+            mb2.rect( glm::vec3{0.0}, glm::vec3{0.0, 0.0, -1.0}, glm::vec3{1.0, 0.0, 0.0} );
             auto mesh2 = mb2.build();
-
-            MeshBuilder mb3;
-            mb3.add_vertex( -1.0, 0.0, -1.0 );
-            mb3.add_vertex( 1.0, 0.0, -1.0 );
-            mb3.add_vertex( 1.0, 0.0, 1.0 );
-            mb3.add_vertex( -1.0, 0.0, 1.0 );
-            mb3.add_color( 0.0, 0.5, 0.0 );
-            mb3.add_color( 0.0, 0.5, 0.0 );
-            mb3.add_color( 0.0, 0.5, 0.0 );
-            mb3.add_color( 0.0, 0.5, 0.0 );
-            mb3.add_index( 0 ); mb3.add_index( 2 ); mb3.add_index( 1 );
-            mb3.add_index( 3 ); mb3.add_index( 2 ); mb3.add_index( 0 );
-            auto mesh3 = mb3.build();
 
             auto program_handle = program_cache.load<ShaderProgramLoader>(
                     "shader_program"_hs, 
@@ -71,10 +42,23 @@ class MyState : public State {
                     auto terrain = registry.create();
                     registry.assign<Transform>( terrain, Transform{}.translate( 2*i, -2.0, 2*j ) );
                     registry.assign<Hierarchy>( terrain );
-                    if( (i+j)%2 == 0 ) {
                         registry.assign<Model>( terrain, mesh2, program_handle );
+                    if( (i+j)%2 == 0 ) {
+                        registry.assign<Material>( 
+                                terrain, 
+                                glm::vec3{0.1, 0.1, 0.0}, 
+                                glm::vec3{0.5, 0.5, 0.5},  
+                                glm::vec3{0.3, 0.3, 0.3},  
+                                1.0
+                        );
                     } else {
-                        registry.assign<Model>( terrain, mesh3, program_handle );
+                        registry.assign<Material>( 
+                                terrain, 
+                                glm::vec3{0.0, 0.5, 0.0}, 
+                                glm::vec3{0.0, 0.0, 0.0},  
+                                glm::vec3{0.5, 0.5, 0.5},  
+                                1.0
+                        );
                     }
                 }
             }
@@ -88,6 +72,7 @@ class MyState : public State {
             registry.assign<Model>( _base, mesh, program_handle );
             registry.assign<Transform>( _base, Transform{}.translate(0.0, 0.2, 0.0).scale(2.0, 0.4, 2.0) );
             registry.assign<Hierarchy>( _base, _machine );
+            registry.assign<Material>( _base, glm::vec3{0.5, 0.5, 0.5}, 0.2, 0.5, 0.5, 2.0 );
 
             _arm_level = registry.create();
             registry.assign<Transform>( _arm_level, Transform{}.translate(0.0, 0.2, 0.0) );
@@ -97,6 +82,7 @@ class MyState : public State {
             registry.assign<Model>( _arm, mesh, program_handle );
             registry.assign<Transform>( _arm, Transform{}.translate(0.0, 1.0, 0.0).scale( 0.5, 2.0, 0.5 ) );
             registry.assign<Hierarchy>( _arm, _arm_level );
+            registry.assign<Material>( _arm, glm::vec3{0.7, 0.7, 0.7}, 0.2, 0.5, 0.5, 10.0 );
 
             _forearm_level = registry.create();
             registry.assign<Transform>( _forearm_level, Transform{}.translate(0.0, 2.0, 0.0) );
@@ -106,6 +92,7 @@ class MyState : public State {
             registry.assign<Model>( _forearm, mesh, program_handle );
             registry.assign<Transform>( _forearm, Transform{}.translate(0.0, 0.5, 0.0).scale( 0.4, 2.0, 0.4 ) );
             registry.assign<Hierarchy>( _forearm, _forearm_level );
+            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.2, 0.5, 0.5, 20.0 );
 
             //// Create player with camera
             _player = registry.create();
@@ -117,6 +104,10 @@ class MyState : public State {
             registry.assign<Transform>( _camera );
             registry.assign<Hierarchy>( _camera, _player );
             registry.set<CurrentCamera>( _camera );
+
+            //// Light
+            auto light = registry.create();
+            registry.assign<DirectionalLight>( light, glm::vec4{-1.0, -1.0, 0.0, 0.0}, glm::vec3{1.0, 1.0, 0.8} );
 
             // Set previous mouse position
             auto window = registry.ctx<std::shared_ptr<Window>>();
@@ -176,6 +167,8 @@ class MyState : public State {
 
             transform_system( registry );
             camera_system( registry );
+            //material_system( registry );
+            light_system( registry );
             model_system( registry );
 
             _prev_mouse_x = _new_mouse_x;

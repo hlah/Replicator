@@ -15,7 +15,8 @@ class Mesh {
         Mesh( 
             const std::vector<GLuint>& indices,
             const std::vector<glm::vec4>& vertices, 
-            const std::vector<glm::vec4>& colors = {}
+            const std::vector<glm::vec4>& colors = {},
+            const std::vector<glm::vec4>& normals = {}
         );
         ~Mesh();
 
@@ -26,6 +27,7 @@ class Mesh {
         GLuint _index_buffer = 0;
         GLuint _vertex_buffer = 0;
         GLuint _color_buffer = 0;
+        GLuint _normal_buffer = 0;
         GLuint _vao = 0;
         size_t _index_array_size = 0;
         std::shared_ptr<bool> _ref_counter;
@@ -34,12 +36,19 @@ class Mesh {
 class MeshBuilder {
     public:
         // Add vertice to mesh
-        void add_vertex( float x, float y, float z, float w=1.0 );
+        void add_vertex( glm::vec3 v, unsigned int count=1 ) { add_vertex( glm::vec4{v, 1.0}, count ); };
+        void add_vertex( glm::vec4 v, unsigned int count=1 );
         // Add color attribute
-        void add_color( float r, float g, float b, float a=1.0 );
+        void add_color( glm::vec3 c, unsigned int count=1 ) { add_color( glm::vec4{c, 1.0}, count ); };
+        void add_color( glm::vec4 c, unsigned int count=1 );
+        // Add normal
+        void add_normal( glm::vec3 n, unsigned int count=1 ) { add_normal( glm::vec4{n, 0.0}, count ); };
+        void add_normal( glm::vec4 n, unsigned int count=1 );
         // Add index
         void add_index( GLuint index );
 
+        // Adde rectangle with normals
+        void rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right );
         // Add a cube with clockwise winding
         void cube( float side );
 
@@ -49,7 +58,9 @@ class MeshBuilder {
     private:
         std::vector<glm::vec4> _vertices;
         std::vector<glm::vec4> _colors;
+        std::vector<glm::vec4> _normals;
         std::vector<GLuint> _indices;
+
 };
 
 class MeshCreationException : public std::exception {

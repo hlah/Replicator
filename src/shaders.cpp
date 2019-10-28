@@ -95,10 +95,29 @@ ShaderProgram::~ShaderProgram() {
 void ShaderProgram::use() const {
     glUseProgram(_program_id);
     // set pending uniforms
-    for( auto& uniform : _uniforms_to_set ) {
+    // mat4
+    for( auto& uniform : _uniforms_to_set_m4 ) {
         glUniformMatrix4fv( uniform.first, 1, GL_FALSE, glm::value_ptr(uniform.second) );
     }
-    _uniforms_to_set.clear();
+    // vec3
+    for( auto& uniform : _uniforms_to_set_v3 ) {
+        glUniform3fv( uniform.first, 1, glm::value_ptr(uniform.second) );
+    }
+    // vec4
+    for( auto& uniform : _uniforms_to_set_v4 ) {
+        glUniform4fv( uniform.first, 1, glm::value_ptr(uniform.second) );
+    }
+    // floats
+    for( auto uniform : _uniforms_to_set_f ) {
+        glUniform1f( uniform.first, uniform.second );
+    }
+    // uints
+    for( auto uniform : _uniforms_to_set_u ) {
+        glUniform1ui( uniform.first, uniform.second );
+    }
+    _uniforms_to_set_m4.clear();
+    _uniforms_to_set_v3.clear();
+    _uniforms_to_set_f.clear();
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::string& vs_filename, const std::string fs_filename ) const {

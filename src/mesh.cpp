@@ -3,11 +3,15 @@
 Mesh::Mesh( 
         const std::vector<GLuint>& indices,
         const std::vector<glm::vec4>& vertices, 
-        const std::vector<glm::vec4>& colors
+        const std::vector<glm::vec4>& colors,
+        const std::vector<glm::vec4>& normals 
 ) {
     // Check sizes
     if( colors.size() != 0 && colors.size() != vertices.size() ) {
         throw MeshCreationException{"Number of color attribues must be equal to vertices or zero!"};
+    }
+    if( colors.size() != 0 && colors.size() != vertices.size() ) {
+        throw MeshCreationException{"Number of normal attribues must be equal to vertices or zero!"};
     }
 
     // Create vertex array object
@@ -50,6 +54,24 @@ Mesh::Mesh(
         _color_buffer = color_buffer;
     }
 
+    // create normal array
+    if( normals.size() > 0 ) {
+        size_t normal_array_size = normals.size()*4;
+        // Create normal buffer
+        GLuint normal_buffer;
+        glGenBuffers(1, &normal_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*normal_array_size, NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*normal_array_size, normals.data());
+
+        // Bind to Vao
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(2);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        _normal_buffer = normal_buffer;
+    }
+
     // create index array
     _index_array_size = indices.size();
 
@@ -69,6 +91,8 @@ Mesh::Mesh(
 Mesh::~Mesh() {
     if( _ref_counter.unique() ) {
         glDeleteBuffers(1, &_vertex_buffer);
+        glDeleteBuffers(1, &_normal_buffer);
+        glDeleteBuffers(1, &_color_buffer);
         glDeleteBuffers(1, &_index_buffer);
     }
 }
@@ -81,54 +105,63 @@ void Mesh::draw( const ShaderProgram& program ) const {
 }
 
 
-void MeshBuilder::add_vertex( float x, float y, float z, float w ) {
-    _vertices.push_back( glm::vec4( x, y, z, w ) );
+void MeshBuilder::add_vertex( glm::vec4 v, unsigned int count ) {
+    for( unsigned int i=0; i<count; i++ ) {
+        _vertices.push_back( v );
+    }
 }
 
-void MeshBuilder::add_color( float r, float g, float b, float a ) {
-    _colors.push_back( glm::vec4( r, g, b, a ) );
+
+void MeshBuilder::add_color( glm::vec4 c, unsigned int count ) {
+    for( unsigned int i=0; i<count; i++ ) {
+        _colors.push_back( c );
+    }
 }
+
+void MeshBuilder::add_normal( glm::vec4 normal, unsigned int count ) {
+    normal = glm::normalize( normal );
+    for( unsigned int i=0; i<count; i++ ) {
+        _normals.push_back( normal );
+    }
+}
+
+
 
 void MeshBuilder::add_index( GLuint index ) {
     _indices.push_back( index );
 }
 
+void MeshBuilder::rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right ) {
+    auto normal = glm::normalize( glm::cross(right, top) );
+    add_vertex( pos - right + top );
+    add_vertex( pos + right + top );
+    add_vertex( pos + right - top );
+    add_vertex( pos - right - top );
+    add_normal( normal, 4 );
+
+    add_index( _vertices.size()-4 );
+    add_index( _vertices.size()-2 );
+    add_index( _vertices.size()-3 );
+
+    add_index( _vertices.size()-4 );
+    add_index( _vertices.size()-1 );
+    add_index( _vertices.size()-2 );
+}
 
 void MeshBuilder::cube( float side ) {
     auto side_2 = side / 2.f;
-
-    // vertices
-    add_vertex( -side_2, side_2, side_2 );
-    add_vertex( side_2, side_2, side_2 );
-    add_vertex( side_2, -side_2, side_2 );
-    add_vertex( -side_2, -side_2, side_2 );
-
-    add_vertex( -side_2, side_2, -side_2 );
-    add_vertex( side_2, side_2, -side_2 );
-    add_vertex( side_2, -side_2, -side_2 );
-    add_vertex( -side_2, -side_2, -side_2 );
-
-    // indices
-    //FRONT
-    add_index(0); add_index(3); add_index(1);
-    add_index(3); add_index(2); add_index(1);
+    // FRONT
+    rect( {0.0, 0.0, side_2}, {0.0, side_2, 0.0}, {side_2, 0.0, 0.0} );
     // BACK
-    add_index(4); add_index(5); add_index(6);
-    add_index(4); add_index(6); add_index(7);
+    rect( {0.0, 0.0, -side_2}, {0.0, side_2, 0.0}, {-side_2, 0.0, 0.0} );
     // LEFT
-    add_index(0); add_index(4); add_index(7);
-    add_index(3); add_index(0); add_index(7);
+    rect( {-side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, side_2} );
     // RIGHT
-    add_index(5); add_index(1); add_index(2);
-    add_index(6); add_index(5); add_index(2);
+    rect( {side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, -side_2} );
     // TOP
-    add_index(4); add_index(0); add_index(5);
-    add_index(0); add_index(1); add_index(5);
+    rect( {0.0, side_2, 0.0}, {0.0, 0.0, -side_2}, {side_2, 0.0, 0.0} );
     // BOTTOM
-    add_index(7); add_index(2); add_index(3);
-    add_index(7); add_index(6); add_index(2);
-
-
+    rect( {0.0, -side_2, 0.0}, {0.0, 0.0, side_2}, {side_2, 0.0, 0.0} );
 }
 
 Mesh MeshBuilder::build() {
@@ -139,5 +172,5 @@ Mesh MeshBuilder::build() {
         }
     }
 
-    return Mesh{ _indices, _vertices, _colors };
+    return Mesh{ _indices, _vertices, _colors, _normals };
 }

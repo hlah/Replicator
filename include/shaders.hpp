@@ -1,6 +1,9 @@
 #ifndef _REPLICATOR_SHADERS_HPP_
 #define _REPLICATOR_SHADERS_HPP_
 
+#include "material.hpp"
+#include "lights.hpp"
+
 #include "glad/glad.h"
 
 #include "glm/mat4x4.hpp"
@@ -45,13 +48,37 @@ class ShaderProgram {
         // Set uniform value
         void uniform( const std::string name, const glm::mat4& value ) {
             auto location = glGetUniformLocation( _program_id, name.c_str() );
-            _uniforms_to_set[ location ] = value;
+            _uniforms_to_set_m4[ location ] = value;
+        }
+        void uniform( const std::string name, const GLuint value  ) {
+            auto location = glGetUniformLocation( _program_id, name.c_str() );
+            _uniforms_to_set_u[ location ] = value;
+        }
+        void uniform( const std::string name, const Material& value ) {
+            auto ambient_loc = glGetUniformLocation( _program_id, (name + std::string{".ambient"}).c_str());
+            auto diffuse_loc = glGetUniformLocation( _program_id, (name + std::string{".diffuse"}).c_str());
+            auto specular_loc = glGetUniformLocation( _program_id, (name + std::string{".specular"}).c_str());
+            auto shininess_loc = glGetUniformLocation( _program_id, (name + std::string{".shininess"}).c_str());
+            _uniforms_to_set_v3[ ambient_loc ] = value.ambient();
+            _uniforms_to_set_v3[ diffuse_loc ] = value.diffuse();
+            _uniforms_to_set_v3[ specular_loc ] = value.specular();
+            _uniforms_to_set_f[ shininess_loc ] = value.shininess();
+        }
+        void uniform( const std::string& name, const DirectionalLight& value ) {
+            auto direction_loc = glGetUniformLocation( _program_id, (name + std::string{".direction"}).c_str());
+            auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
+            _uniforms_to_set_v4[ direction_loc ] = value.direction;
+            _uniforms_to_set_v3[ color_loc ] = value.color;
         }
 
     private:
         GLuint _program_id;
 
-        mutable std::unordered_map<GLint, glm::mat4> _uniforms_to_set;
+        mutable std::unordered_map<GLint, glm::mat4> _uniforms_to_set_m4;
+        mutable std::unordered_map<GLint, glm::vec3> _uniforms_to_set_v3;
+        mutable std::unordered_map<GLint, glm::vec4> _uniforms_to_set_v4;
+        mutable std::unordered_map<GLint, GLfloat> _uniforms_to_set_f;
+        mutable std::unordered_map<GLint, GLuint> _uniforms_to_set_u;
 
         friend class ShaderProgramDeleter;
 };
