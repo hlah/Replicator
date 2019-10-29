@@ -64,17 +64,15 @@ class ShaderProgram {
             _uniforms_to_set_v3[ specular_loc ] = value.specular();
             _uniforms_to_set_f[ shininess_loc ] = value.shininess();
         }
-        void uniform( const std::string& name, const DirectionalLight& value ) {
+        void uniform( const std::string& name, const ShaderLight& value ) {
+            auto type_loc = glGetUniformLocation( _program_id, (name + std::string{".type"}).c_str());
+            auto position_loc = glGetUniformLocation( _program_id, (name + std::string{".position"}).c_str());
             auto direction_loc = glGetUniformLocation( _program_id, (name + std::string{".direction"}).c_str());
             auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
-            _uniforms_to_set_v4[ direction_loc ] = value.direction();
-            _uniforms_to_set_v3[ color_loc ] = value.color();
-        }
-        void uniform( const std::string& name, const PointLight& value ) {
-            auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
-            auto position_loc = glGetUniformLocation( _program_id, (name + std::string{".position"}).c_str());
-            _uniforms_to_set_v3[ color_loc ] = value.color();
-            _uniforms_to_set_v4[ position_loc ] = value.position();
+            _uniforms_to_set_u[ type_loc ] = value.type;
+            _uniforms_to_set_v4[ position_loc ] = value.position;
+            _uniforms_to_set_v4[ direction_loc ] = value.direction;
+            _uniforms_to_set_v3[ color_loc ] = value.color;
         }
 
     private:

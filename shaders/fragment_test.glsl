@@ -1,5 +1,9 @@
 #version 330 core
 
+#define DIRECTIONAL     1u
+#define POINT           2u
+#define SPOTLIGHT       4u
+
 in vec4 color_f;
 in vec4 normal_f;
 in vec4 position_f;
@@ -12,23 +16,19 @@ uniform struct {
     float shininess;
 } material;
 
-struct directional_light {
-    vec4 direction;
-    vec3 color;
-};
+struct light {
+    uint type;
 
-struct point_light {
     vec4 position;
+    vec4 direction;
+
     vec3 color;
 };
 
 uniform mat4 view_transform;
 
-uniform directional_light directional_lights[2];
-uniform uint directional_lights_count;
-
-uniform point_light point_lights[16];
-uniform uint point_lights_count;
+uniform light lights[16];
+uniform uint light_count;
 
 vec3 ambient_light(vec3 light_color) {
     return material.ambient * light_color;
@@ -49,18 +49,19 @@ void main() {
 
     color = vec4(0.0, 0.0, 0.0, 1.0);
 
-    // directional lights
-    for( uint i=0u; i<directional_lights_count; i++ ) {
-        color += vec4(ambient_light(directional_lights[i].color), 0.0);
-        color += vec4(diffuse_light(directional_lights[i].color, -directional_lights[i].direction), 0.0);
-        color += vec4(specular_light(directional_lights[i].color, -directional_lights[i].direction, view_direction), 0.0);
+    for( uint i=0u; i<light_count; i++ ) {
+        if( (lights[i].type & DIRECTIONAL) > 0u ) {
+            vec4 light_direction = -lights[i].direction;
+            color += vec4(ambient_light(lights[i].color), 0.0);
+            color += vec4(diffuse_light(lights[i].color, light_direction), 0.0);
+            color += vec4(specular_light(lights[i].color, light_direction, view_direction), 0.0);
+        }
+        if( (lights[i].type & POINT) > 0u ) {
+            vec4 light_direction = normalize(lights[i].position - position_f);
+            color += vec4(ambient_light(lights[i].color), 0.0);
+            color += vec4(diffuse_light(lights[i].color, light_direction), 0.0);
+            color += vec4(specular_light(lights[i].color, light_direction, view_direction), 0.0);
+        }
     }
 
-    // point lights
-    for( uint i=0u; i<point_lights_count; i++ ) {
-        vec4 light_direction = normalize( point_lights[i].position - position_f );
-        color += vec4(ambient_light(point_lights[i].color), 0.0);
-        color += vec4(diffuse_light(point_lights[i].color, light_direction), 0.0);
-        color += vec4(specular_light(point_lights[i].color, light_direction, view_direction), 0.0);
-    }
 }

@@ -106,18 +106,21 @@ class MyState : public State {
             registry.set<CurrentCamera>( _camera );
 
             //// Lights
-            //auto light = registry.create();
-            //registry.assign<DirectionalLight>( light, glm::vec3{1.0, 1.0, 0.8} );
-            //registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
-            //registry.assign<Hierarchy>( light );
+            auto light = registry.create();
+            registry.assign<LightColor>( light, glm::vec3{1.0, 1.0, 0.8} );
+            registry.assign<DirectionalLight>( light );
+            registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
+            registry.assign<Hierarchy>( light );
 
             auto light2 = registry.create();
-            registry.assign<PointLight>( light2, glm::vec3{1.0, 0.2, 1.0} );
+            registry.assign<LightColor>( light2, glm::vec3{1.0, 0.2, 1.0} );
+            registry.assign<PointLight>( light2 );
             registry.assign<Transform>( light2, Transform{}.translate( -4.0, 1.0, 4.0 ) );
             registry.assign<Hierarchy>( light2 );
 
             auto light3 = registry.create();
-            registry.assign<PointLight>( light3, glm::vec3{0.2, 1.0, 0.2} );
+            registry.assign<LightColor>( light3, glm::vec3{0.2, 1.0, 0.2});
+            registry.assign<PointLight>( light3 );
             registry.assign<Transform>( light3, Transform{}.translate( 4.0, 1.0, -4.0 ) );
             registry.assign<Hierarchy>( light3 );
 

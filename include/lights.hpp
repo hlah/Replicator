@@ -6,33 +6,30 @@
 
 #include "entt/entt.hpp"
 
-class DirectionalLight {
-    public:
-        DirectionalLight( glm::vec3 color ) : _color{color} {}
 
-        inline const glm::vec4& direction() const { return _direction; }
+struct ShaderLight {
+    enum Type : unsigned int {
+        None = 0,
+        Directional = 1,
+        Point = 2,
+        SpotLight = 4,
+    };
+    glm::vec4 position{0.0, 0.0, 0.0, 0.0};
+    glm::vec4 direction{0.0, 0.0, 0.0, 0.0};
+    glm::vec3 color{0.0, 0.0, 0.0};
+    Type type = None;
+};
+
+class LightColor {
+    public:
+        LightColor( glm::vec3 color ) : _color{color} {}
         inline const glm::vec3& color() const { return _color; }
     private:
         glm::vec3 _color;
-        glm::vec4 _direction = glm::vec4{0.0, 0.0, -1.0, 0.0};
-
-        friend void light_system( entt::registry& registry ); 
 };
 
-class PointLight {
-    public:
-        PointLight( glm::vec3 color ) : _color{color} {}
-
-        inline const glm::vec4& position() const { return _position; }
-        inline const glm::vec3& color() const { return _color; }
-
-    private:
-        glm::vec3 _color;
-        glm::vec4 _position;
-
-        friend void light_system( entt::registry& registry ); 
-};
-
+class DirectionalLight{};
+class PointLight {};
 
 void light_system( entt::registry& registry ); 
 
