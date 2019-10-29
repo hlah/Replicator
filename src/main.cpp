@@ -92,7 +92,7 @@ class MyState : public State {
             registry.assign<Model>( _forearm, mesh, program_handle );
             registry.assign<Transform>( _forearm, Transform{}.translate(0.0, 0.5, 0.0).scale( 0.4, 2.0, 0.4 ) );
             registry.assign<Hierarchy>( _forearm, _forearm_level );
-            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.2, 0.5, 0.5, 20.0 );
+            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.2, 0.5, 1.5, 20.0 );
 
             //// Create player with camera
             _player = registry.create();
@@ -107,7 +107,9 @@ class MyState : public State {
 
             //// Light
             auto light = registry.create();
-            registry.assign<DirectionalLight>( light, glm::vec4{-1.0, -1.0, 0.0, 0.0}, glm::vec3{1.0, 1.0, 0.8} );
+            registry.assign<DirectionalLight>( light, glm::vec3{1.0, 1.0, 0.8} );
+            registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
+            registry.assign<Hierarchy>( light );
 
             // Set previous mouse position
             auto window = registry.ctx<std::shared_ptr<Window>>();

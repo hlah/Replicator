@@ -67,8 +67,8 @@ class ShaderProgram {
         void uniform( const std::string& name, const DirectionalLight& value ) {
             auto direction_loc = glGetUniformLocation( _program_id, (name + std::string{".direction"}).c_str());
             auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
-            _uniforms_to_set_v4[ direction_loc ] = value.direction;
-            _uniforms_to_set_v3[ color_loc ] = value.color;
+            _uniforms_to_set_v4[ direction_loc ] = value.direction();
+            _uniforms_to_set_v3[ color_loc ] = value.color();
         }
 
     private:
