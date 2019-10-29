@@ -17,10 +17,18 @@ struct directional_light {
     vec3 color;
 };
 
+struct point_light {
+    vec4 position;
+    vec3 color;
+};
+
 uniform mat4 view_transform;
 
 uniform directional_light directional_lights[2];
 uniform uint directional_lights_count;
+
+uniform point_light point_lights[16];
+uniform uint point_lights_count;
 
 vec3 ambient_light(vec3 light_color) {
     return material.ambient * light_color;
@@ -46,5 +54,13 @@ void main() {
         color += vec4(ambient_light(directional_lights[i].color), 0.0);
         color += vec4(diffuse_light(directional_lights[i].color, -directional_lights[i].direction), 0.0);
         color += vec4(specular_light(directional_lights[i].color, -directional_lights[i].direction, view_direction), 0.0);
+    }
+
+    // point lights
+    for( uint i=0u; i<point_lights_count; i++ ) {
+        vec4 light_direction = normalize( point_lights[i].position - position_f );
+        color += vec4(ambient_light(point_lights[i].color), 0.0);
+        color += vec4(diffuse_light(point_lights[i].color, light_direction), 0.0);
+        color += vec4(specular_light(point_lights[i].color, light_direction, view_direction), 0.0);
     }
 }

@@ -70,6 +70,12 @@ class ShaderProgram {
             _uniforms_to_set_v4[ direction_loc ] = value.direction();
             _uniforms_to_set_v3[ color_loc ] = value.color();
         }
+        void uniform( const std::string& name, const PointLight& value ) {
+            auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
+            auto position_loc = glGetUniformLocation( _program_id, (name + std::string{".position"}).c_str());
+            _uniforms_to_set_v3[ color_loc ] = value.color();
+            _uniforms_to_set_v4[ position_loc ] = value.position();
+        }
 
     private:
         GLuint _program_id;

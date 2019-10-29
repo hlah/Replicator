@@ -19,6 +19,20 @@ class DirectionalLight {
         friend void light_system( entt::registry& registry ); 
 };
 
+class PointLight {
+    public:
+        PointLight( glm::vec3 color ) : _color{color} {}
+
+        inline const glm::vec4& position() const { return _position; }
+        inline const glm::vec3& color() const { return _color; }
+
+    private:
+        glm::vec3 _color;
+        glm::vec4 _position;
+
+        friend void light_system( entt::registry& registry ); 
+};
+
 
 void light_system( entt::registry& registry ); 
 
