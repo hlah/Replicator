@@ -35,9 +35,12 @@ add_subdirectory(spdlog)
 # EnTT
 add_subdirectory(entt)
 
+# STB
+include_directories(stb)
+
 # Set warning and errors flags
 set(CMAKE_CXX_STANDARD 17)
-set(warnings "-Wall -Wextra -Werror -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=unused-but-set-variable")
+set(warnings "-Wall -Wextra -Werror -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -Wno-error=type-limits")
 set(CMAKE_CXX_FLAGS "${warnings} ${build_flags}")
 set(CMAKE_C_FLAGS   "${warnings} ${build_flags}")
 
