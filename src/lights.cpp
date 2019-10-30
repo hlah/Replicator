@@ -21,14 +21,31 @@ void light_system( entt::registry& registry ) {
 
 
             ShaderLight shader_light{};
-            if( registry.has<DirectionalLight>( entity ) ) {
+
+            bool directional = registry.has<DirectionalLight>( entity ); 
+            bool point = registry.has<PointLight>( entity ); 
+            bool spotlight = registry.has<Spotlight>( entity ); 
+
+            if( directional || spotlight ) {
                 shader_light.direction = glm::normalize(transform.global_matrix() * glm::vec4{ 0.0, 0.0, -1.0, 0.0 });
+            }
+            if( point || spotlight ) {
+                shader_light.position = transform.global_matrix() * glm::vec4{ 0.0, 0.0, 0.0, 1.0 };
+            }
+
+            if( directional ) {
                 shader_light.type = (ShaderLight::Type)(shader_light.type | ShaderLight::Type::Directional);
             }
-            if( registry.has<PointLight>( entity ) ) {
-                shader_light.position = transform.global_matrix() * glm::vec4{ 0.0, 0.0, 0.0, 1.0 };
+            if( point ) {
                 shader_light.type = (ShaderLight::Type)(shader_light.type | ShaderLight::Type::Point);
             }
+            if( spotlight ) {
+                auto& spotlight_comp = registry.get<Spotlight>( entity );
+                shader_light.type = (ShaderLight::Type)(shader_light.type | ShaderLight::Type::Spotlight);
+                shader_light.inner_angle = spotlight_comp.inner();
+                shader_light.outer_angle = spotlight_comp.outer();
+            }
+
             shader_light.color = light.color();
 
             // TODO Optimization: update matrices only once for each shader program (from a model)

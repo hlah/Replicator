@@ -46,7 +46,7 @@ class MyState : public State {
                     if( (i+j)%2 == 0 ) {
                         registry.assign<Material>( 
                                 terrain, 
-                                glm::vec3{0.1, 0.1, 0.0}, 
+                                glm::vec3{0.01, 0.01, 0.0}, 
                                 glm::vec3{0.5, 0.5, 0.5},  
                                 glm::vec3{0.3, 0.3, 0.3},  
                                 1.0
@@ -54,7 +54,7 @@ class MyState : public State {
                     } else {
                         registry.assign<Material>( 
                                 terrain, 
-                                glm::vec3{0.0, 0.5, 0.0}, 
+                                glm::vec3{0.0, 0.05, 0.0}, 
                                 glm::vec3{0.0, 0.0, 0.0},  
                                 glm::vec3{0.5, 0.5, 0.5},  
                                 1.0
@@ -72,7 +72,7 @@ class MyState : public State {
             registry.assign<Model>( _base, mesh, program_handle );
             registry.assign<Transform>( _base, Transform{}.translate(0.0, 0.2, 0.0).scale(2.0, 0.4, 2.0) );
             registry.assign<Hierarchy>( _base, _machine );
-            registry.assign<Material>( _base, glm::vec3{0.5, 0.5, 0.5}, 0.2, 0.5, 0.5, 2.0 );
+            registry.assign<Material>( _base, glm::vec3{0.5, 0.5, 0.5}, 0.02, 0.5, 0.5, 2.0 );
 
             _arm_level = registry.create();
             registry.assign<Transform>( _arm_level, Transform{}.translate(0.0, 0.2, 0.0) );
@@ -82,7 +82,7 @@ class MyState : public State {
             registry.assign<Model>( _arm, mesh, program_handle );
             registry.assign<Transform>( _arm, Transform{}.translate(0.0, 1.0, 0.0).scale( 0.5, 2.0, 0.5 ) );
             registry.assign<Hierarchy>( _arm, _arm_level );
-            registry.assign<Material>( _arm, glm::vec3{0.7, 0.7, 0.7}, 0.2, 0.5, 0.5, 10.0 );
+            registry.assign<Material>( _arm, glm::vec3{0.7, 0.7, 0.7}, 0.02, 0.5, 0.5, 10.0 );
 
             _forearm_level = registry.create();
             registry.assign<Transform>( _forearm_level, Transform{}.translate(0.0, 2.0, 0.0) );
@@ -92,20 +92,27 @@ class MyState : public State {
             registry.assign<Model>( _forearm, mesh, program_handle );
             registry.assign<Transform>( _forearm, Transform{}.translate(0.0, 0.5, 0.0).scale( 0.4, 2.0, 0.4 ) );
             registry.assign<Hierarchy>( _forearm, _forearm_level );
-            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.2, 0.5, 1.5, 20.0 );
+            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.02, 0.5, 1.5, 20.0 );
 
             //// Create player with camera
             _player = registry.create();
             registry.assign<Transform>( _player, Transform{}.translate(0.0, 0.0, 5.0) );
             registry.assign<Hierarchy>( _player );
 
-            _camera = registry.create();
-            registry.assign<Camera>( _camera, (float)M_PI/2.f, -0.1f, -50.0f );
-            registry.assign<Transform>( _camera );
-            registry.assign<Hierarchy>( _camera, _player );
-            registry.set<CurrentCamera>( _camera );
+            _head = registry.create();
+            registry.assign<Transform>( _head );
+            registry.assign<Hierarchy>( _head, _player );
+            registry.set<CurrentCamera>( _head );
+
+            auto camera = registry.create();
+            registry.assign<Camera>( camera, (float)M_PI/2.f, -0.1f, -50.0f );
+            registry.assign<Transform>( camera );
+            registry.assign<Hierarchy>( camera, _head );
+            registry.set<CurrentCamera>( camera );
 
             //// Lights
+
+            /*
             auto light = registry.create();
             registry.assign<LightColor>( light, glm::vec3{1.0, 1.0, 0.8} );
             registry.assign<DirectionalLight>( light );
@@ -123,7 +130,13 @@ class MyState : public State {
             registry.assign<PointLight>( light3 );
             registry.assign<Transform>( light3, Transform{}.translate( 4.0, 1.0, -4.0 ) );
             registry.assign<Hierarchy>( light3 );
+            */
 
+            auto light4 = registry.create();
+            registry.assign<LightColor>( light4, glm::vec3{1.5, 1.5, 1.5});
+            registry.assign<Spotlight>( light4, (float)M_PI/5.f, (float)M_PI/50.f );
+            registry.assign<Transform>( light4 );
+            registry.assign<Hierarchy>( light4, _head );
 
 
             // Set previous mouse position
@@ -162,7 +175,7 @@ class MyState : public State {
         }
 
         virtual Transition update( entt::registry& registry ) override {
-            _cam_x_rotation = -(_new_mouse_y-_prev_mouse_y)*_player_rotation_speed;
+            _head_x_rotation = -(_new_mouse_y-_prev_mouse_y)*_player_rotation_speed;
             _player_y_rotation = -(_new_mouse_x-_prev_mouse_x)*_player_rotation_speed;
 
             auto new_arm_transform = registry.get<Transform>( _arm_level );
@@ -178,9 +191,9 @@ class MyState : public State {
             new_player_transform.rotate_y( _player_y_rotation );
             registry.replace<Transform>( _player, new_player_transform );
 
-            auto new_cam_transform = registry.get<Transform>( _camera );
-            new_cam_transform.rotate_x( _cam_x_rotation );
-            registry.replace<Transform>( _camera, new_cam_transform );
+            auto new_head_transform = registry.get<Transform>( _head );
+            new_head_transform.rotate_x( _head_x_rotation );
+            registry.replace<Transform>( _head, new_head_transform );
 
             transform_system( registry );
             camera_system( registry );
@@ -206,7 +219,7 @@ class MyState : public State {
             }
         }
 
-        entt::entity _player, _camera;
+        entt::entity _player, _head;
         entt::entity _machine, _base, _arm_level, _arm, _forearm_level, _forearm;
 
         const float _arm_rotation_speed = 0.05;
@@ -217,7 +230,7 @@ class MyState : public State {
 
         const float _player_rotation_speed = 0.005;
         float _player_y_rotation = 0.0;
-        float _cam_x_rotation = 0.0;
+        float _head_x_rotation = 0.0;
 
         const float _player_speed = 0.1;
         float _player_horizontal_v = 0.0;

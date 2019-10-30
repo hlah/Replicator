@@ -23,6 +23,9 @@ struct light {
     vec4 direction;
 
     vec3 color;
+
+    float outer_angle;
+    float inner_angle;
 };
 
 uniform mat4 view_transform;
@@ -61,6 +64,15 @@ void main() {
             color += vec4(ambient_light(lights[i].color), 0.0);
             color += vec4(diffuse_light(lights[i].color, light_direction), 0.0);
             color += vec4(specular_light(lights[i].color, light_direction, view_direction), 0.0);
+        }
+        if( (lights[i].type & SPOTLIGHT) > 0u ) {
+            vec4 light_direction = normalize(lights[i].position - position_f);
+            float theta = dot(light_direction, normalize(-lights[i].direction));
+            float intensity = clamp( (theta-lights[i].outer_angle) / (lights[i].inner_angle - lights[i].outer_angle), 0.0, 1.0); 
+            color += vec4(ambient_light(lights[i].color), 0.0);
+            color += intensity*vec4(diffuse_light(lights[i].color, light_direction), 0.0);
+            color += intensity*vec4(specular_light(lights[i].color, light_direction, view_direction), 0.0);
+            //color = vec4(theta, 0.0, 0.0, 1.0);
         }
     }
 

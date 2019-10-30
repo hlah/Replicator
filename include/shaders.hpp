@@ -69,10 +69,14 @@ class ShaderProgram {
             auto position_loc = glGetUniformLocation( _program_id, (name + std::string{".position"}).c_str());
             auto direction_loc = glGetUniformLocation( _program_id, (name + std::string{".direction"}).c_str());
             auto color_loc = glGetUniformLocation( _program_id, (name + std::string{".color"}).c_str());
+            auto outer_angle_loc = glGetUniformLocation( _program_id, (name + std::string{".outer_angle"}).c_str());
+            auto inner_angle_loc = glGetUniformLocation( _program_id, (name + std::string{".inner_angle"}).c_str());
             _uniforms_to_set_u[ type_loc ] = value.type;
             _uniforms_to_set_v4[ position_loc ] = value.position;
             _uniforms_to_set_v4[ direction_loc ] = value.direction;
             _uniforms_to_set_v3[ color_loc ] = value.color;
+            _uniforms_to_set_f[ outer_angle_loc ] = std::cos(value.outer_angle);
+            _uniforms_to_set_f[ inner_angle_loc ] = std::cos(value.inner_angle);
         }
 
     private:
