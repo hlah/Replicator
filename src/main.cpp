@@ -36,7 +36,7 @@ class MyState : public State {
                     std::vector<std::string>{"../shaders/vertex_main.glsl"}, 
                     std::vector<std::string>{
                         "../shaders/fragment_main.glsl", 
-                        "../shaders/phong_shading.glsl", 
+                        "../shaders/blinn_phong_shading.glsl", 
                         "../shaders/lights.glsl"
                     } 
             );
@@ -52,33 +52,34 @@ class MyState : public State {
             );
 
             /// Create Terrain
-            for( int i = -5; i<=5; i++ ) {
-                for( int j = -5; j<=5; j++ ) {
+            for( int i = -10; i<=10; i++ ) {
+                for( int j = -10; j<=10; j++ ) {
                     auto terrain = registry.create();
                     registry.assign<Transform>( terrain, Transform{}.translate( 2*i, -2.0, 2*j ) );
                     registry.assign<Hierarchy>( terrain );
-                        registry.assign<Model>( terrain, mesh2, program_handle );
+                    registry.assign<Model>( terrain, mesh2, program_handle );
                     if( (i+j)%2 == 0 ) {
                         registry.assign<Material>( 
                                 terrain, 
-                                glm::vec3{0.01, 0.01, 0.0}, 
+                                glm::vec3{0.0, 0.0, 0.0}, 
                                 glm::vec3{0.5, 0.5, 0.5},  
-                                glm::vec3{0.3, 0.3, 0.3},  
-                                1.0
+                                glm::vec3{0.5, 0.5, 0.5},  
+                                20.0
                         );
                     } else {
                         registry.assign<Material>( 
                                 terrain, 
-                                glm::vec3{0.0, 0.05, 0.0}, 
+                                glm::vec3{0.0, 0.0, 0.0}, 
                                 glm::vec3{0.0, 0.0, 0.0},  
                                 glm::vec3{0.5, 0.5, 0.5},  
-                                1.0
+                                20.0
                         );
                     }
                 }
             }
 
             //// Create machine /////
+            /*
             _machine = registry.create();
             registry.assign<Transform>( _machine, Transform{}.translate(0.0, -2.0, 0.0));
             registry.assign<Hierarchy>( _machine );
@@ -118,7 +119,7 @@ class MyState : public State {
             box_material.add_specular_texture( specular_texture_handle );
             box_material.add_diffuse_texture( texture_handle );
             registry.assign<Material>( box, box_material );
-
+            */
 
             //// Create player with camera
             _player = registry.create();
@@ -144,27 +145,27 @@ class MyState : public State {
             registry.assign<DirectionalLight>( light );
             registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
             registry.assign<Hierarchy>( light );
-            */
 
             auto light2 = registry.create();
             registry.assign<LightColor>( light2, glm::vec3{1.0, 0.2, 1.0} );
             registry.assign<PointLight>( light2 );
             registry.assign<Transform>( light2, Transform{}.translate( -4.0, 1.0, 4.0 ) );
             registry.assign<Hierarchy>( light2 );
+            */
 
-            /*
             auto light3 = registry.create();
             registry.assign<LightColor>( light3, glm::vec3{0.2, 1.0, 0.2});
             registry.assign<PointLight>( light3 );
-            registry.assign<Transform>( light3, Transform{}.translate( 4.0, 1.0, -4.0 ) );
+            registry.assign<Transform>( light3, Transform{}.translate( 0.0, 0.1, -10.0 ) );
             registry.assign<Hierarchy>( light3 );
-            */
 
+            /*
             auto light4 = registry.create();
             registry.assign<LightColor>( light4, glm::vec3{1.5, 1.5, 1.5});
             registry.assign<Spotlight>( light4, (float)M_PI/5.f, (float)M_PI/50.f );
             registry.assign<Transform>( light4 );
             registry.assign<Hierarchy>( light4, _head );
+            */
 
 
             // Set previous mouse position
@@ -206,6 +207,7 @@ class MyState : public State {
             _head_x_rotation = -(_new_mouse_y-_prev_mouse_y)*_player_rotation_speed;
             _player_y_rotation = -(_new_mouse_x-_prev_mouse_x)*_player_rotation_speed;
 
+            /*
             auto new_arm_transform = registry.get<Transform>( _arm_level );
             new_arm_transform.rotate_y( _arm_rotation );
             registry.replace<Transform>( _arm_level, new_arm_transform );
@@ -213,6 +215,7 @@ class MyState : public State {
             auto new_forearm_transform = registry.get<Transform>( _forearm_level );
             new_forearm_transform.rotate_z( _forearm_rotation );
             registry.replace<Transform>( _forearm_level, new_forearm_transform );
+            */
 
             auto new_player_transform = registry.get<Transform>( _player );
             new_player_transform.translate(_player_horizontal_v, 0.0, _player_transversal_v);
