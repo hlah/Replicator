@@ -33,8 +33,12 @@ class MyState : public State {
 
             auto program_handle = program_cache.load<ShaderProgramLoader>(
                     "shader_program"_hs, 
-                    "../shaders/vertex_test.glsl", 
-                    "../shaders/fragment_test.glsl" 
+                    std::vector<std::string>{"../shaders/vertex_main.glsl"}, 
+                    std::vector<std::string>{
+                        "../shaders/fragment_main.glsl", 
+                        "../shaders/phong_shading.glsl", 
+                        "../shaders/lights.glsl"
+                    } 
             );
 
             auto texture_handle = texture_cache.load<TextureLoader>( 

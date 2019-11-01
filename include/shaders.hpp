@@ -40,7 +40,7 @@ class ShaderProgramDeleter;
 class ShaderProgram {
     public:
         // Create new program from multiple shaders
-        ShaderProgram(std::initializer_list<Shader>);
+        ShaderProgram(std::vector<Shader>);
 
         // Use shader program
         void use() const;
@@ -135,7 +135,7 @@ class ShaderException : public std::exception {
 
 class ShaderProgramLoader final: public entt::resource_loader<ShaderProgramLoader, ShaderProgram> {
     public:
-        std::shared_ptr<ShaderProgram> load( const std::string& vs_filename, const std::string fs_filename ) const;
+        std::shared_ptr<ShaderProgram> load( const std::vector<std::string>& vs_paths, const std::vector<std::string>& fs_paths ) const;
     private:
         std::string _load_file( const std::string& path ) const;
 };

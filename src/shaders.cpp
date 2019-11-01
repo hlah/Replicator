@@ -47,7 +47,7 @@ Shader::~Shader() {
 
 // ShaderProgram class
 
-ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaders) {
+ShaderProgram::ShaderProgram(std::vector<Shader> shaders) {
     GLuint program_id = glCreateProgram();
 
     // Link program
@@ -133,14 +133,19 @@ void ShaderProgram::use() const {
     _textures_to_set.clear();
 }
 
-std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::string& vs_filename, const std::string fs_filename ) const {
-    auto vs_source = _load_file( vs_filename );
-    auto fs_source = _load_file( fs_filename );
-    auto vs = Shader{ Shader::Type::VERTEX, vs_source };
-    auto fs = Shader{ Shader::Type::FRAGMENT, fs_source };
+std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::vector<std::string>& vs_paths, const std::vector<std::string>& fs_paths ) const {
+    std::vector<Shader> shaders{};
+    for( const auto& vs_path : vs_paths ) {
+        auto vs_src = _load_file(vs_path);
+        shaders.emplace_back( Shader::Type::VERTEX, vs_src );
+    }
+    for( const auto& fs_path : fs_paths ) {
+        auto fs_src = _load_file(fs_path);
+        shaders.emplace_back( Shader::Type::FRAGMENT, fs_src );
+    }
 
     std::shared_ptr<ShaderProgram> program{ 
-        new ShaderProgram{ vs, fs } ,
+        new ShaderProgram{ shaders } ,
         ShaderProgramDeleter{}
     };
 
@@ -158,5 +163,4 @@ std::string ShaderProgramLoader::_load_file( const std::string& path ) const {
 void ShaderProgramDeleter::operator()(ShaderProgram* program) {
     glDeleteProgram( program->_program_id );
     spdlog::debug("Deleted shader program, id={}", program->_program_id);
-    delete program;
 }
