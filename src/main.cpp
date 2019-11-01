@@ -21,6 +21,7 @@ class MyState : public State {
     public:
         virtual Transition on_start( entt::registry& registry ) override {
             auto& program_cache = registry.set<entt::resource_cache<ShaderProgram>>();
+            auto& texture_cache = registry.set<entt::resource_cache<Texture>>();
 
             MeshBuilder mb;
             mb.cube( 1.0 );
@@ -34,6 +35,16 @@ class MyState : public State {
                     "shader_program"_hs, 
                     "../shaders/vertex_test.glsl", 
                     "../shaders/fragment_test.glsl" 
+            );
+
+            auto texture_handle = texture_cache.load<TextureLoader>( 
+                    "container_texture"_hs,
+                    "../textures/container2.png"
+            );
+
+            auto specular_texture_handle = texture_cache.load<TextureLoader>( 
+                    "container_diffuse_texture"_hs,
+                    "../textures/container2_specular.png"
             );
 
             /// Create Terrain
@@ -94,6 +105,17 @@ class MyState : public State {
             registry.assign<Hierarchy>( _forearm, _forearm_level );
             registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.02, 0.5, 1.5, 20.0 );
 
+            //// Create box
+            auto box = registry.create();
+            registry.assign<Model>( box, mesh, program_handle );
+            registry.assign<Transform>( box, Transform{}.translate(5.0, 0.0, 0.0).scale( 4.0, 4.0, 4.0 ) );
+            registry.assign<Hierarchy>( box );
+            Material box_material{ glm::vec3{0.0}, 0.0, 0.0, 0.0, 5.0 };
+            box_material.add_specular_texture( specular_texture_handle );
+            box_material.add_diffuse_texture( texture_handle );
+            registry.assign<Material>( box, box_material );
+
+
             //// Create player with camera
             _player = registry.create();
             registry.assign<Transform>( _player, Transform{}.translate(0.0, 0.0, 5.0) );
@@ -118,6 +140,7 @@ class MyState : public State {
             registry.assign<DirectionalLight>( light );
             registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
             registry.assign<Hierarchy>( light );
+            */
 
             auto light2 = registry.create();
             registry.assign<LightColor>( light2, glm::vec3{1.0, 0.2, 1.0} );
@@ -125,6 +148,7 @@ class MyState : public State {
             registry.assign<Transform>( light2, Transform{}.translate( -4.0, 1.0, 4.0 ) );
             registry.assign<Hierarchy>( light2 );
 
+            /*
             auto light3 = registry.create();
             registry.assign<LightColor>( light3, glm::vec3{0.2, 1.0, 0.2});
             registry.assign<PointLight>( light3 );

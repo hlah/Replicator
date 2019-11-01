@@ -16,7 +16,8 @@ class Mesh {
             const std::vector<GLuint>& indices,
             const std::vector<glm::vec4>& vertices, 
             const std::vector<glm::vec4>& colors = {},
-            const std::vector<glm::vec4>& normals = {}
+            const std::vector<glm::vec4>& normals = {},
+            const std::vector<glm::vec2>& texcoords = {}
         );
         ~Mesh();
 
@@ -28,6 +29,7 @@ class Mesh {
         GLuint _vertex_buffer = 0;
         GLuint _color_buffer = 0;
         GLuint _normal_buffer = 0;
+        GLuint _texcoord_buffer = 0;
         GLuint _vao = 0;
         size_t _index_array_size = 0;
         std::shared_ptr<bool> _ref_counter;
@@ -44,6 +46,8 @@ class MeshBuilder {
         // Add normal
         void add_normal( glm::vec3 n, unsigned int count=1 ) { add_normal( glm::vec4{n, 0.0}, count ); };
         void add_normal( glm::vec4 n, unsigned int count=1 );
+        // Add texture coordinates
+        void add_texcoord( glm::vec2 t, unsigned int count=1 );
         // Add index
         void add_index( GLuint index );
 
@@ -59,6 +63,7 @@ class MeshBuilder {
         std::vector<glm::vec4> _vertices;
         std::vector<glm::vec4> _colors;
         std::vector<glm::vec4> _normals;
+        std::vector<glm::vec2> _texcoords;
         std::vector<GLuint> _indices;
 
 };

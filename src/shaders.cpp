@@ -115,9 +115,22 @@ void ShaderProgram::use() const {
     for( auto uniform : _uniforms_to_set_u ) {
         glUniform1ui( uniform.first, uniform.second );
     }
+    // ints
+    for( auto uniform : _uniforms_to_set_i ) {
+        glUniform1i( uniform.first, uniform.second );
+    }
+    // textures
+    for( auto texture : _textures_to_set ) {
+        glActiveTexture(GL_TEXTURE0 + texture.first);
+        glBindTexture(GL_TEXTURE_2D, texture.second);
+    }
     _uniforms_to_set_m4.clear();
+    _uniforms_to_set_v4.clear();
     _uniforms_to_set_v3.clear();
     _uniforms_to_set_f.clear();
+    _uniforms_to_set_u.clear();
+    _uniforms_to_set_i.clear();
+    _textures_to_set.clear();
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramLoader::load( const std::string& vs_filename, const std::string fs_filename ) const {

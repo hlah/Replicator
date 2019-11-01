@@ -63,6 +63,32 @@ class ShaderProgram {
             _uniforms_to_set_v3[ diffuse_loc ] = value.diffuse();
             _uniforms_to_set_v3[ specular_loc ] = value.specular();
             _uniforms_to_set_f[ shininess_loc ] = value.shininess();
+
+            GLuint i = 0;
+            unsigned int diffuse_texs = 0;
+            unsigned int specular_texs = 0;
+
+            // diffuse textures
+            for( const auto& texture : value.diffuse_textures() ) {
+                _textures_to_set[i] = *texture;
+                auto diffuse_texture_loc = glGetUniformLocation( _program_id, (name + std::string{".diffuse_textures["} + std::to_string(diffuse_texs) + std::string{"]"}).c_str() );
+                _uniforms_to_set_i[ diffuse_texture_loc ] = i;
+                diffuse_texs++;
+                i++;
+            }
+            auto diffuse_texture_count_loc  = glGetUniformLocation( _program_id, (name + std::string{".diffuse_texture_count"}).c_str());
+            _uniforms_to_set_u[ diffuse_texture_count_loc ] = diffuse_texs;
+
+            // specular textures
+            for( const auto& texture : value.specular_textures() ) {
+                _textures_to_set[i] = *texture;
+                auto specular_texture_loc = glGetUniformLocation( _program_id, (name + std::string{".specular_textures["} + std::to_string(specular_texs) + std::string{"]"}).c_str() );
+                _uniforms_to_set_i[ specular_texture_loc ] = i;
+                specular_texs++;
+                i++;
+            }
+            auto specular_texture_count_loc  = glGetUniformLocation( _program_id, (name + std::string{".specular_texture_count"}).c_str());
+            _uniforms_to_set_u[ specular_texture_count_loc ] = specular_texs;
         }
         void uniform( const std::string& name, const ShaderLight& value ) {
             auto type_loc = glGetUniformLocation( _program_id, (name + std::string{".type"}).c_str());
@@ -87,6 +113,8 @@ class ShaderProgram {
         mutable std::unordered_map<GLint, glm::vec4> _uniforms_to_set_v4;
         mutable std::unordered_map<GLint, GLfloat> _uniforms_to_set_f;
         mutable std::unordered_map<GLint, GLuint> _uniforms_to_set_u;
+        mutable std::unordered_map<GLint, GLint> _uniforms_to_set_i;
+        mutable std::unordered_map<GLenum, GLuint> _textures_to_set;
 
         friend class ShaderProgramDeleter;
 };

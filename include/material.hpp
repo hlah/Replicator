@@ -5,6 +5,8 @@
 
 #include "entt/entt.hpp"
 
+#include "texture.hpp"
+
 class Material {
     public:
         Material( 
@@ -22,12 +24,19 @@ class Material {
             float shininess
         ) : _ambient{color*ambient}, _diffuse{color*diffuse}, _specular{color*specular}, _shininess{shininess} {}
 
+        void add_diffuse_texture( entt::resource_handle<Texture> texture ) { _diffuse_textures.push_back( texture ); }
+        void add_specular_texture( entt::resource_handle<Texture> texture ) { _specular_textures.push_back( texture ); }
+
         inline const glm::vec3& ambient() const { return _ambient; }
         inline const glm::vec3& diffuse() const { return _diffuse; }
         inline const glm::vec3& specular() const { return _specular; }
         inline float shininess() const { return _shininess; }
+        inline const auto& diffuse_textures() const { return _diffuse_textures; }
+        inline const auto& specular_textures() const { return _specular_textures; }
 
     private:
+        std::vector<entt::resource_handle<Texture>> _diffuse_textures{};
+        std::vector<entt::resource_handle<Texture>> _specular_textures{};
         glm::vec3 _ambient;
         glm::vec3 _diffuse;
         glm::vec3 _specular;
