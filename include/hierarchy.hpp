@@ -12,6 +12,9 @@ class Hierarchy {
         inline entt::entity prev() const { return _prev; }
         inline entt::entity first() const { return _first; }
 
+        // Return true if rhs is an ancestor of rhs
+        bool compare( const entt::registry& registry, const entt::entity rhs ) const;
+
         // update hierarchy components when hierarchy component is added
         static void on_construct(entt::entity entity, entt::registry& registry, Hierarchy& hierarchy);
 

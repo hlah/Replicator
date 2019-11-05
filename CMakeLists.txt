@@ -38,6 +38,12 @@ add_subdirectory(entt)
 # STB
 include_directories(stb)
 
+# Assimp
+set(ASSIMP_NO_EXPORT ON)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+add_subdirectory(assimp)
+
 # Set warning and errors flags
 set(CMAKE_CXX_STANDARD 17)
 set(warnings "-Wall -Wextra -Werror -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -Wno-error=type-limits")
@@ -55,6 +61,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog)
 target_link_libraries(${PROJECT_NAME} PUBLIC EnTT)
+target_link_libraries(${PROJECT_NAME} PUBLIC assimp )
 
 
 

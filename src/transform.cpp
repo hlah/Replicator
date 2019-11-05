@@ -22,6 +22,10 @@ Transform& Transform::rotate_z( float angle ) {
     _rotation = glm::rotate( _rotation, angle, glm::vec3{0.0, 0.0, 1.0} );
     return *this;
 }
+Transform& Transform::rotate( const glm::quat& rot ) {
+    _rotation = _rotation * rot;
+    return *this;
+}
 Transform& Transform::rotate_x_global( float angle ) {
     _rotation = glm::angleAxis( angle, glm::vec3{1.f, 0.f, 0.f} ) * _rotation;
     return *this;
@@ -42,19 +46,20 @@ Transform& Transform::translate( float x, float y, float z ) {
 } 
 
 void transform_system( entt::registry& registry ) {
-    auto group = registry.group<Transform, Hierarchy>();
+    registry.sort<Transform, Hierarchy>();
+    auto view = registry.view<Transform, Hierarchy>();
 
-    group.sort([&registry](const entt::entity lhs, const entt::entity rhs){
-            auto& left_h = registry.get<Hierarchy>( lhs );
-            auto& right_h = registry.get<Hierarchy>( rhs );
-            return lhs == right_h.parent() || left_h.next() == rhs
-                || (!(lhs == right_h.parent() || left_h.next() == rhs) 
-                        && ( left_h.parent() < right_h.parent() || (left_h.parent() == right_h.parent() && &left_h < &right_h ) ) );
-    });
-
-    for( auto entity : group ) {
+    //spdlog::debug("Sorted:");
+    for( auto entity : view ) {
         auto& transform = registry.get<Transform>(entity);
         auto& hierarchy = registry.get<Hierarchy>(entity);
+
+        auto name = std::string{"entity_"} + std::to_string( (int)entity );
+        if( registry.has<std::string>( entity ) ) { 
+            name +=  std::string{" ("} + registry.get<std::string>(entity) + std::string{")"};
+        }
+        //spdlog::debug("{}", name);
+
         if( hierarchy.parent() != entt::null ) {
             auto parent_transform_ptr = registry.try_get<Transform>(hierarchy.parent());
             if( parent_transform_ptr != nullptr ) {

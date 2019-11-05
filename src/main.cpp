@@ -6,6 +6,7 @@
 #include "camera.hpp"
 #include "hierarchy.hpp"
 #include "material.hpp"
+#include "model_loader.hpp"
 
 #include "matrix_op.hpp"
 
@@ -41,6 +42,9 @@ class MyState : public State {
                     } 
             );
 
+            auto model = load_model( registry, "../models/space/source/Sketchfab_2016_01_02_20_11_57.blend.blend", program_handle );
+            registry.replace<Transform>( model, Transform{}.scale( 1.0, 1.0, 1.0 ).translate(0.0, -2.0, 0.0).rotate_x( (float)-M_PI/2.f ) );
+
             auto texture_handle = texture_cache.load<TextureLoader>( 
                     "container_texture"_hs,
                     "../textures/container2.png"
@@ -52,6 +56,7 @@ class MyState : public State {
             );
 
             /// Create Terrain
+            /*
             for( int i = -10; i<=10; i++ ) {
                 for( int j = -10; j<=10; j++ ) {
                     auto terrain = registry.create();
@@ -77,6 +82,7 @@ class MyState : public State {
                     }
                 }
             }
+            */
 
             //// Create machine /////
             /*
@@ -139,9 +145,8 @@ class MyState : public State {
 
             //// Lights
 
-            /*
             auto light = registry.create();
-            registry.assign<LightColor>( light, glm::vec3{1.0, 1.0, 0.8} );
+            registry.assign<LightColor>( light, glm::vec3{0.5, 0.5, 0.5} );
             registry.assign<DirectionalLight>( light );
             registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
             registry.assign<Hierarchy>( light );
@@ -151,7 +156,6 @@ class MyState : public State {
             registry.assign<PointLight>( light2 );
             registry.assign<Transform>( light2, Transform{}.translate( -4.0, 1.0, 4.0 ) );
             registry.assign<Hierarchy>( light2 );
-            */
 
             auto light3 = registry.create();
             registry.assign<LightColor>( light3, glm::vec3{0.2, 1.0, 0.2});

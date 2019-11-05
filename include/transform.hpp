@@ -23,6 +23,7 @@ class Transform {
         Transform& rotate_x( float angle );
         Transform& rotate_y( float angle );
         Transform& rotate_z( float angle );
+        Transform& rotate( const glm::quat& rot );
         Transform& rotate_x_global( float angle );
         Transform& rotate_y_global( float angle );
         Transform& rotate_z_global( float angle );
