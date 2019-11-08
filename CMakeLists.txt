@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Replicator)
+project(ReplicatorEngine)
 
 # Flag information for editor completion
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -50,13 +50,15 @@ set(warnings "-Wall -Wextra -Werror -Wno-error=unused-variable -Wno-error=unused
 set(CMAKE_CXX_FLAGS "${warnings} ${build_flags}")
 set(CMAKE_C_FLAGS   "${warnings} ${build_flags}")
 
-# Add include folder
-include_directories(include)
 # Add source folder
-file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.c)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.c)
 
 # Add executable and link libraries
 add_library(${PROJECT_NAME} ${SOURCES})
+# Add include folder
+include_directories(include/replicator include)
+target_include_directories(${PROJECT_NAME} INTERFACE include)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog)
