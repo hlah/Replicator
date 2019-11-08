@@ -19,6 +19,7 @@ namespace matrix_op {
     glm::mat4 rotate_y( float angle );
     glm::mat4 rotate_z( float angle );
     glm::mat4 rotate_x( float angle );
+    glm::mat4 rotate( float angle, glm::vec4 axis );
 
 
 

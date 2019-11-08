@@ -55,6 +55,19 @@ namespace matrix_op {
         };
     }
 
+    glm::mat4 rotate( float angle, glm::vec4 axis ) {
+        float c = cos(-angle);
+        float s = sin(-angle);
+        axis = glm::normalize(axis);
+        return glm::mat4{
+               axis.x*axis.x*(1-c)+c,   axis.x*axis.y*(1-c)-axis.z*s,    axis.x*axis.z*(1-c)+axis.y*s,   0.0,
+        axis.x*axis.y*(1-c)+axis.z*s,          axis.y*axis.y*(1-c)+c,    axis.y*axis.z*(1-c)-axis.x*s,   0.0,
+        axis.x*axis.z*(1-c)-axis.y*s,   axis.y*axis.z*(1-c)+axis.x*s,           axis.z*axis.z*(1-c)+c,   0.0,
+                                 0.0,                            0.0,                             0.0,   1.0
+    
+        };
+    }
+
     // orthographic projection matrix
     glm::mat4 orthographic( 
             float left, 

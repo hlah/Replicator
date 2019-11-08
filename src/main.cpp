@@ -24,13 +24,13 @@ class MyState : public State {
             auto& program_cache = registry.set<entt::resource_cache<ShaderProgram>>();
             auto& texture_cache = registry.set<entt::resource_cache<Texture>>();
 
-            MeshBuilder mb;
-            mb.cube( 1.0 );
-            auto mesh = mb.build();
+            MeshBuilder mb_rect;
+            mb_rect.rect( glm::vec3{0.0}, glm::vec3{0.0, 0.0, -1.0}, glm::vec3{1.0, 0.0, 0.0} );
+            auto mesh_rect = mb_rect.build();
 
-            MeshBuilder mb2;
-            mb2.rect( glm::vec3{0.0}, glm::vec3{0.0, 0.0, -1.0}, glm::vec3{1.0, 0.0, 0.0} );
-            auto mesh2 = mb2.build();
+            MeshBuilder mb_cylinder;
+            mb_cylinder.cylinder( glm::vec3{0.2, 0.0, 0.0}, glm::vec3{0.0, 0.5, 0.0}, 64, glm::vec3{0.0, 0.5, 0.0} );
+            auto mesh_cylinder = mb_cylinder.build();
 
             auto program_handle = program_cache.load<ShaderProgramLoader>(
                     "shader_program"_hs, 
@@ -42,90 +42,45 @@ class MyState : public State {
                     } 
             );
 
-            auto model = load_model( registry, "../models/space/source/Sketchfab_2016_01_02_20_11_57.blend.blend", program_handle );
-            registry.replace<Transform>( model, Transform{}.scale( 1.0, 1.0, 1.0 ).translate(0.0, -2.0, 0.0).rotate_x( (float)-M_PI/2.f ) );
-
-            auto texture_handle = texture_cache.load<TextureLoader>( 
-                    "container_texture"_hs,
-                    "../textures/container2.png"
+            // create cylinder
+            auto cylinder = registry.create();
+            registry.assign<Model>( cylinder, mesh_cylinder, program_handle );
+            registry.assign<Material>( 
+                    cylinder, 
+                    glm::vec3{0.1, 0.1, 0.0}, 
+                    glm::vec3{0.9, 0.9, 0.3},  
+                    glm::vec3{0.5, 0.5, 0.5},  
+                    50.0
             );
-
-            auto specular_texture_handle = texture_cache.load<TextureLoader>( 
-                    "container_diffuse_texture"_hs,
-                    "../textures/container2_specular.png"
-            );
+            registry.assign<Hierarchy>( cylinder );
+            registry.assign<Transform>( cylinder, Transform{}.translate( 0.0, -2.0, 0.0 ) );
 
             /// Create Terrain
-            /*
             for( int i = -10; i<=10; i++ ) {
                 for( int j = -10; j<=10; j++ ) {
                     auto terrain = registry.create();
                     registry.assign<Transform>( terrain, Transform{}.translate( 2*i, -2.0, 2*j ) );
                     registry.assign<Hierarchy>( terrain );
-                    registry.assign<Model>( terrain, mesh2, program_handle );
+                    registry.assign<Model>( terrain, mesh_rect, program_handle );
                     if( (i+j)%2 == 0 ) {
                         registry.assign<Material>( 
                                 terrain, 
                                 glm::vec3{0.0, 0.0, 0.0}, 
                                 glm::vec3{0.5, 0.5, 0.5},  
-                                glm::vec3{0.5, 0.5, 0.5},  
+                                glm::vec3{0.2, 0.2, 0.2},  
                                 20.0
                         );
                     } else {
                         registry.assign<Material>( 
                                 terrain, 
                                 glm::vec3{0.0, 0.0, 0.0}, 
-                                glm::vec3{0.0, 0.0, 0.0},  
-                                glm::vec3{0.5, 0.5, 0.5},  
+                                glm::vec3{0.8, 0.8, 0.8},  
+                                glm::vec3{0.1, 0.1, 0.1},  
                                 20.0
                         );
                     }
                 }
             }
-            */
-
-            //// Create machine /////
-            /*
-            _machine = registry.create();
-            registry.assign<Transform>( _machine, Transform{}.translate(0.0, -2.0, 0.0));
-            registry.assign<Hierarchy>( _machine );
-
-            _base = registry.create();
-            registry.assign<Model>( _base, mesh, program_handle );
-            registry.assign<Transform>( _base, Transform{}.translate(0.0, 0.2, 0.0).scale(2.0, 0.4, 2.0) );
-            registry.assign<Hierarchy>( _base, _machine );
-            registry.assign<Material>( _base, glm::vec3{0.5, 0.5, 0.5}, 0.02, 0.5, 0.5, 2.0 );
-
-            _arm_level = registry.create();
-            registry.assign<Transform>( _arm_level, Transform{}.translate(0.0, 0.2, 0.0) );
-            registry.assign<Hierarchy>( _arm_level, _machine );
-
-            _arm = registry.create();
-            registry.assign<Model>( _arm, mesh, program_handle );
-            registry.assign<Transform>( _arm, Transform{}.translate(0.0, 1.0, 0.0).scale( 0.5, 2.0, 0.5 ) );
-            registry.assign<Hierarchy>( _arm, _arm_level );
-            registry.assign<Material>( _arm, glm::vec3{0.7, 0.7, 0.7}, 0.02, 0.5, 0.5, 10.0 );
-
-            _forearm_level = registry.create();
-            registry.assign<Transform>( _forearm_level, Transform{}.translate(0.0, 2.0, 0.0) );
-            registry.assign<Hierarchy>( _forearm_level, _arm_level );
-
-            _forearm = registry.create();
-            registry.assign<Model>( _forearm, mesh, program_handle );
-            registry.assign<Transform>( _forearm, Transform{}.translate(0.0, 0.5, 0.0).scale( 0.4, 2.0, 0.4 ) );
-            registry.assign<Hierarchy>( _forearm, _forearm_level );
-            registry.assign<Material>( _forearm, glm::vec3{0.7, 0.3, 0.3}, 0.02, 0.5, 1.5, 20.0 );
-
-            //// Create box
-            auto box = registry.create();
-            registry.assign<Model>( box, mesh, program_handle );
-            registry.assign<Transform>( box, Transform{}.translate(5.0, 0.0, 0.0).scale( 4.0, 4.0, 4.0 ) );
-            registry.assign<Hierarchy>( box );
-            Material box_material{ glm::vec3{0.0}, 0.0, 0.0, 0.0, 5.0 };
-            box_material.add_specular_texture( specular_texture_handle );
-            box_material.add_diffuse_texture( texture_handle );
-            registry.assign<Material>( box, box_material );
-            */
 
             //// Create player with camera
             _player = registry.create();
@@ -151,27 +106,6 @@ class MyState : public State {
             registry.assign<Transform>( light, Transform{}.rotate_y_global( (float)M_PI/2.f ).rotate_z_global( (float)M_PI/4.f ) );
             registry.assign<Hierarchy>( light );
 
-            auto light2 = registry.create();
-            registry.assign<LightColor>( light2, glm::vec3{1.0, 0.2, 1.0} );
-            registry.assign<PointLight>( light2 );
-            registry.assign<Transform>( light2, Transform{}.translate( -4.0, 1.0, 4.0 ) );
-            registry.assign<Hierarchy>( light2 );
-
-            auto light3 = registry.create();
-            registry.assign<LightColor>( light3, glm::vec3{0.2, 1.0, 0.2});
-            registry.assign<PointLight>( light3 );
-            registry.assign<Transform>( light3, Transform{}.translate( 0.0, 0.1, -10.0 ) );
-            registry.assign<Hierarchy>( light3 );
-
-            /*
-            auto light4 = registry.create();
-            registry.assign<LightColor>( light4, glm::vec3{1.5, 1.5, 1.5});
-            registry.assign<Spotlight>( light4, (float)M_PI/5.f, (float)M_PI/50.f );
-            registry.assign<Transform>( light4 );
-            registry.assign<Hierarchy>( light4, _head );
-            */
-
-
             // Set previous mouse position
             auto window = registry.ctx<std::shared_ptr<Window>>();
             _new_mouse_x = _prev_mouse_x = window->mouse_x();
@@ -187,12 +121,6 @@ class MyState : public State {
             if( action.name() == "Close" && action.type() == ActionEvent::Type::ON ) {
                 return State::Transition::QUIT;
             }
-
-            handle_action( action, "RotateArm", _arm_rotation, _arm_rotation_speed );
-            handle_action( action, "RotateArmInv", _arm_rotation, -_arm_rotation_speed );
-            handle_action( action, "RotateForeArm", _forearm_rotation, _forearm_rotation_speed );
-            handle_action( action, "RotateForeArmInv", _forearm_rotation, -_forearm_rotation_speed );
-
             handle_action( action, "CameraMoveRight", _player_horizontal_v, _player_speed );
             handle_action( action, "CameraMoveLeft", _player_horizontal_v, -_player_speed );
             handle_action( action, "CameraMoveForward", _player_transversal_v, -_player_speed );
@@ -211,16 +139,6 @@ class MyState : public State {
             _head_x_rotation = -(_new_mouse_y-_prev_mouse_y)*_player_rotation_speed;
             _player_y_rotation = -(_new_mouse_x-_prev_mouse_x)*_player_rotation_speed;
 
-            /*
-            auto new_arm_transform = registry.get<Transform>( _arm_level );
-            new_arm_transform.rotate_y( _arm_rotation );
-            registry.replace<Transform>( _arm_level, new_arm_transform );
-
-            auto new_forearm_transform = registry.get<Transform>( _forearm_level );
-            new_forearm_transform.rotate_z( _forearm_rotation );
-            registry.replace<Transform>( _forearm_level, new_forearm_transform );
-            */
-
             auto new_player_transform = registry.get<Transform>( _player );
             new_player_transform.translate(_player_horizontal_v, 0.0, _player_transversal_v);
             new_player_transform.rotate_y( _player_y_rotation );
@@ -232,7 +150,6 @@ class MyState : public State {
 
             transform_system( registry );
             camera_system( registry );
-            //material_system( registry );
             light_system( registry );
             model_system( registry );
 
@@ -255,13 +172,6 @@ class MyState : public State {
         }
 
         entt::entity _player, _head;
-        entt::entity _machine, _base, _arm_level, _arm, _forearm_level, _forearm;
-
-        const float _arm_rotation_speed = 0.05;
-        float _arm_rotation = 0.0;
-
-        const float _forearm_rotation_speed = 0.05;
-        float _forearm_rotation = 0.0;
 
         const float _player_rotation_speed = 0.005;
         float _player_y_rotation = 0.0;
@@ -283,11 +193,6 @@ int main() {
     engine.set_aa(16);
 
     engine.bind_key( Key::Escape, "Close" );
-
-    engine.bind_key( Key::A, "RotateArm" );
-    engine.bind_key( Key::D, "RotateArmInv" );
-    engine.bind_key( Key::S, "RotateForeArm" );
-    engine.bind_key( Key::W, "RotateForeArmInv" );
 
     engine.bind_key( Key::Right, "CameraMoveRight" );
     engine.bind_key( Key::Left, "CameraMoveLeft" );

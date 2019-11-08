@@ -1,7 +1,9 @@
 #ifndef _REPLICATOR_MESH_HPP_
 #define _REPLICATOR_MESH_HPP_
 
-#include <glm/vec4.hpp>
+#define GLM_FORCE_SWIZZLE
+#include "glm/vec4.hpp"
+#include "glm/vec3.hpp"
 #include "glad/glad.h"
 
 #include <vector>
@@ -55,6 +57,10 @@ class MeshBuilder {
         void rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right );
         // Add a cube with clockwise winding
         void cube( float side );
+        // Add a circle with given radius and section
+        void circle( glm::vec3 radius_angle, glm::vec3 front, unsigned int sections, glm::vec3 position = glm::vec3{0.0} );
+        // Add a cylinder
+        void cylinder( glm::vec3 radius_angle, glm::vec3 up_height, unsigned int sections, glm::vec3 position = glm::vec3{0.0} );
 
         // Build mesh
         Mesh build();

@@ -1,5 +1,9 @@
 #include "mesh.hpp"
 
+#include "matrix_op.hpp"
+
+#include "spdlog/spdlog.h"
+
 Mesh::Mesh( 
         const std::vector<GLuint>& indices,
         const std::vector<glm::vec4>& vertices, 
@@ -198,6 +202,55 @@ void MeshBuilder::cube( float side ) {
     rect( {0.0, side_2, 0.0}, {0.0, 0.0, -side_2}, {side_2, 0.0, 0.0} );
     // BOTTOM
     rect( {0.0, -side_2, 0.0}, {0.0, 0.0, side_2}, {side_2, 0.0, 0.0} );
+}
+
+void MeshBuilder::circle( glm::vec3 radius_angle, glm::vec3 front, unsigned int sections, glm::vec3 position ) {
+    auto prev_num_vertices = _vertices.size();
+    // make radius_angle ortogonal to front
+    radius_angle = radius_angle - (glm::dot( radius_angle, front ) * front);
+    // central vertex
+    add_vertex( position );
+    // circunference vertices
+    for( unsigned int i=0; i<sections; i++  ) {
+        glm::vec4 dir = matrix_op::rotate( ((float)i/(float)sections)*M_PI*2.0, glm::vec4{front, 0.0} ) * glm::vec4{radius_angle, 0.0};
+        add_vertex( position + dir.xyz() );
+        //spdlog::debug("circle point: {} {} {}", dir.x, dir.y, dir.z);
+    }
+    add_normal( front, sections+1 );
+    // add sections
+    for( unsigned int i=0; i<sections; i++  ) {
+        add_index( prev_num_vertices );
+        add_index( prev_num_vertices+i+1 );
+        add_index( prev_num_vertices+((i+1)%sections)+1 );
+    }
+
+}
+
+void MeshBuilder::cylinder( glm::vec3 radius_angle, glm::vec3 up_height, unsigned int sections, glm::vec3 position ) {
+    // top and bottom cicrles
+    circle( radius_angle, up_height, sections, position+up_height );
+    circle( radius_angle, -up_height, sections, position-up_height );
+
+    // sides
+    auto prev_num_vertices = _vertices.size();
+    // vertices and normals
+    for( unsigned int i=0; i<sections; i++ ) {
+        glm::vec4 dir = matrix_op::rotate( ((float)i/(float)sections)*M_PI*2.0, glm::vec4{up_height, 0.0} ) * glm::vec4{radius_angle, 0.0};
+        add_vertex( position + dir.xyz() + up_height );
+        add_vertex( position + dir.xyz() - up_height );
+        add_normal( dir, 2 );
+    }
+    // sections
+    for( unsigned int i=0; i<sections; i++ ) {
+        add_index( prev_num_vertices + (i*2)%(sections*2) );
+        add_index( prev_num_vertices + (i*2+1)%(sections*2) );
+        add_index( prev_num_vertices + (i*2+2)%(sections*2) );
+
+        add_index( prev_num_vertices + (i*2+1)%(sections*2) );
+        add_index( prev_num_vertices + (i*2+3)%(sections*2) );
+        add_index( prev_num_vertices + (i*2+2)%(sections*2) );
+    }
+
 }
 
 Mesh MeshBuilder::build() {
