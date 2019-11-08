@@ -1,15 +1,18 @@
 #ifndef _REPLICATOR_MESH_HPP_
 #define _REPLICATOR_MESH_HPP_
 
+
 #define GLM_FORCE_SWIZZLE
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glad/glad.h"
 
+#include "shaders.hpp"
+
 #include <vector>
 #include <memory>
+#include <map>
 
-#include "shaders.hpp"
 
 class Mesh {
     public:
@@ -61,6 +64,8 @@ class MeshBuilder {
         void circle( glm::vec3 radius_angle, glm::vec3 front, unsigned int sections, glm::vec3 position = glm::vec3{0.0} );
         // Add a cylinder
         void cylinder( glm::vec3 radius_angle, glm::vec3 up_height, unsigned int sections, glm::vec3 position = glm::vec3{0.0} );
+        // Add icosphere
+        void icosphere( float radius, unsigned int divisions, glm::vec3 position = glm::vec3{0.0} );
 
         // Build mesh
         Mesh build();
@@ -71,6 +76,8 @@ class MeshBuilder {
         std::vector<glm::vec4> _normals;
         std::vector<glm::vec2> _texcoords;
         std::vector<GLuint> _indices;
+
+        unsigned int _get_middle_vertex( std::map<std::pair<unsigned int, unsigned int>, unsigned int>& mp_map, std::vector<glm::vec3>& vertices, std::pair<unsigned int, unsigned int> segment );
 
 };
 

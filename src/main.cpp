@@ -32,6 +32,11 @@ class MyState : public State {
             mb_cylinder.cylinder( glm::vec3{0.2, 0.0, 0.0}, glm::vec3{0.0, 0.5, 0.0}, 64, glm::vec3{0.0, 0.5, 0.0} );
             auto mesh_cylinder = mb_cylinder.build();
 
+            MeshBuilder mb_sphere;
+            mb_sphere.icosphere( 0.3, 3 );
+            auto mesh_sphere = mb_sphere.build();
+
+
             auto program_handle = program_cache.load<ShaderProgramLoader>(
                     "shader_program"_hs, 
                     std::vector<std::string>{"../shaders/vertex_main.glsl"}, 
@@ -54,6 +59,19 @@ class MyState : public State {
             );
             registry.assign<Hierarchy>( cylinder );
             registry.assign<Transform>( cylinder, Transform{}.translate( 0.0, -2.0, 0.0 ) );
+
+            // create sphere
+            auto sphere = registry.create();
+            registry.assign<Model>( sphere, mesh_sphere, program_handle );
+            registry.assign<Material>( 
+                    sphere, 
+                    glm::vec3{0.1, 0.1, 0.0}, 
+                    glm::vec3{0.9, 0.9, 0.3},  
+                    glm::vec3{0.5, 0.5, 0.5},  
+                    50.0
+            );
+            registry.assign<Hierarchy>( sphere );
+            registry.assign<Transform>( sphere, Transform{}.translate( 0.0, -0.7, 0.0 ) );
 
             /// Create Terrain
             for( int i = -10; i<=10; i++ ) {

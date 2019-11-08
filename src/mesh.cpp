@@ -4,6 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
+
 Mesh::Mesh( 
         const std::vector<GLuint>& indices,
         const std::vector<glm::vec4>& vertices, 
@@ -253,6 +254,79 @@ void MeshBuilder::cylinder( glm::vec3 radius_angle, glm::vec3 up_height, unsigne
 
 }
 
+// Add icosphere
+void MeshBuilder::icosphere( float radius, unsigned int divisions, glm::vec3 position ) {
+    auto prev_num_vertices = _vertices.size();
+
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::uvec3> triangles;
+
+    auto g = (1.0f + sqrt(5.f)) / 2.f;
+
+    vertices.push_back(glm::normalize(glm::vec3{-1, g, 0}));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{1, g, 0})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{-1, -g, 0})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{1, -g, 0})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{0, -1, g})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{0, 1, g})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{0, -1, -g})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{0, 1, -g})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{g, 0, -1})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{g, 0, 1})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{-g, 0, -1})));
+    vertices.push_back(glm::normalize(normalize(glm::vec3{-g, 0, 1})));
+
+    triangles.push_back( {0, 11, 5} );
+    triangles.push_back ( {0, 5 ,1 } );
+    triangles.push_back( { 0 ,    1 ,    7} );
+    triangles.push_back( { 0 ,    7 ,    10} );
+    triangles.push_back( { 0 ,    10 ,   11} );
+    triangles.push_back( { 1 ,    5 ,    9} );
+    triangles.push_back( { 5 ,    11 ,   4} );
+    triangles.push_back( { 11 ,   10 ,   2} );
+    triangles.push_back( { 10 ,   7 ,    6} );
+    triangles.push_back( { 7 ,    1 ,    8} );
+    triangles.push_back( { 3 ,    9 ,    4} );
+    triangles.push_back( { 3 ,    4 ,    2} );
+    triangles.push_back( { 3 ,    2 ,    6} );
+    triangles.push_back( { 3 ,    6 ,    8} );
+    triangles.push_back( { 3 ,    8 ,    9} );
+    triangles.push_back( { 4 ,    9 ,    5} );
+    triangles.push_back( { 2 ,    4 ,    11} );
+    triangles.push_back( { 6 ,    2 ,    10} );
+    triangles.push_back( { 8 ,    6 ,    7} );
+    triangles.push_back( { 9 ,    8 ,    1} );
+
+    for( unsigned int d=0; d < divisions; d++ ) {
+        std::vector<glm::uvec3> new_triangles;
+        std::map<std::pair<unsigned int, unsigned int>, unsigned int> middle_vertices;
+
+        for( const auto& triangle : triangles ) {
+            auto mid_xy = _get_middle_vertex( middle_vertices, vertices, {triangle.x, triangle.y} );
+            auto mid_yz = _get_middle_vertex( middle_vertices, vertices, {triangle.y, triangle.z} );
+            auto mid_zx = _get_middle_vertex( middle_vertices, vertices, {triangle.z, triangle.x} );
+            new_triangles.push_back( {triangle.x, mid_xy, mid_zx} );
+            new_triangles.push_back( {triangle.y, mid_yz, mid_xy} );
+            new_triangles.push_back( {triangle.z, mid_zx, mid_yz} );
+            new_triangles.push_back( {mid_xy, mid_yz, mid_zx} );
+        }
+
+        triangles = std::move( new_triangles );
+    }
+
+    for( const auto& vertex : vertices ) {
+        add_vertex( position + radius * vertex );
+        add_normal( vertex );
+    }
+
+    for( const auto& triangle : triangles ) {
+        add_index( prev_num_vertices + triangle.x );
+        add_index( prev_num_vertices + triangle.y );
+        add_index( prev_num_vertices + triangle.z );
+    }
+
+}
+
 Mesh MeshBuilder::build() {
     // if no indices are set use sequence of number of vertices TODO: should not modify _indices
     if( _vertices.size() > 0 && _indices.size() == 0 ) {
@@ -262,4 +336,18 @@ Mesh MeshBuilder::build() {
     }
 
     return Mesh{ _indices, _vertices, _colors, _normals, _texcoords };
+}
+
+unsigned int MeshBuilder::_get_middle_vertex( std::map<std::pair<unsigned int, unsigned int>, unsigned int>& mp_map, std::vector<glm::vec3>& vertices, std::pair<unsigned int, unsigned int> segment ) {
+    if( mp_map.count( segment ) == 1 ) {
+        return mp_map.at(segment);
+    }
+    auto inverted = std::pair{ segment.second, segment.first };
+    if( mp_map.count( inverted ) ) {
+        return mp_map.at( inverted );
+    } 
+    auto middle_point = glm::normalize( vertices[ segment.first ] + vertices[ segment.second ] );
+    vertices.push_back( middle_point );
+    mp_map[ segment ] = vertices.size()-1;
+    return vertices.size() - 1;
 }
