@@ -1,6 +1,7 @@
 #ifndef _REPLICATOR_TRANSFORM_H_
 #define _REPLICATOR_TRANSFORM_H_
 
+#include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtx/quaternion.hpp"
 
@@ -28,12 +29,23 @@ class Transform {
         Transform& rotate_y_global( float angle );
         Transform& rotate_z_global( float angle );
 
+        inline void set_rotation( const glm::quat& rot ) { _rotation = rot; }
+        const glm::quat& get_rotation() const { return _rotation; }
+
         // translation
         inline Transform& translate_global( float x, float y, float z ) { _translation += glm::vec4{x, y, z, 0.0}; return *this; }
+        inline Transform& translate_global( const glm::vec3& translation ) { _translation += glm::vec4{translation, 0.0}; return *this; }
+        inline Transform& translate_global( const glm::vec4& translation ) { _translation += translation; return *this; }
         Transform& translate( float x, float y, float z ); 
+
+        inline void set_translation( const glm::vec3& translation ) { _translation = glm::vec4{translation, 0.0}; }
+        inline const glm::vec4& get_translation() const { return _translation; }
 
         // scale
         inline Transform& scale( float sx, float sy, float sz ) { _scale *= glm::vec3{sx, sy, sz}; return *this; }
+        inline Transform& scale( const glm::vec3& s ) { _scale *= s; return *this; }
+        inline void set_scale( const glm::vec3& s ) { _scale = s; }
+        inline const glm::vec3& get_scale() const { return _scale; }
 
     private:
         glm::vec4 _translation{0.0, 0.0, 0.0, 0.0};
