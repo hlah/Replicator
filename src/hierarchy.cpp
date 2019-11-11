@@ -1,6 +1,9 @@
 #include "hierarchy.hpp" 
 #include "spdlog/spdlog.h"
 
+// Flag resource for hierarchy update
+struct HierarchyChanged{};
+
 bool Hierarchy::compare( const entt::registry& registry, const entt::entity rhs ) const {
     if( rhs == entt::null || rhs == this->_parent || rhs == this->_prev ) {
         //spdlog::debug("\t1");
@@ -18,6 +21,7 @@ bool Hierarchy::compare( const entt::registry& registry, const entt::entity rhs 
             } 
         }
     }
+
     return false;
 } 
 
@@ -42,14 +46,7 @@ void Hierarchy::on_construct(entt::entity entity, entt::registry& registry, Hier
         }
     }
 
-    // sort
-    registry.sort<Hierarchy>([&registry](const entt::entity lhs, const entt::entity rhs){
-            auto& right_h = registry.get<Hierarchy>( rhs );
-            auto result = right_h.compare( registry, lhs );
-            auto result_str = result ? std::string{"YES"} : std::string{"NO"};
-            //spdlog::debug("{} < {} ? {}", (int)lhs, (int)rhs, result_str);
-            return result;
-    });
+    registry.set<HierarchyChanged>();
 }
 
 
@@ -80,9 +77,17 @@ void Hierarchy::on_destroy(entt::entity entity, entt::registry& registry) {
         }
     }
 
-    // sort
-    registry.sort<Hierarchy>([&registry](const entt::entity lhs, const entt::entity rhs){
-            auto& right_h = registry.get<Hierarchy>( rhs );
-            return right_h.compare( registry, lhs );
-    });
+    registry.set<HierarchyChanged>();
+}
+
+void hierarchy_system( entt::registry& registry ) {
+    // sort if any changes were made
+    if( registry.try_ctx<HierarchyChanged>() != nullptr ) {
+        spdlog::debug("Sorted!!!!!!!");
+        registry.sort<Hierarchy>([&registry](const entt::entity lhs, const entt::entity rhs){
+                auto& right_h = registry.get<Hierarchy>( rhs );
+                return right_h.compare( registry, lhs );
+        });
+        registry.unset<HierarchyChanged>();
+    }
 }

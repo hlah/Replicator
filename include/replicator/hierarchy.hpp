@@ -28,6 +28,7 @@ class Hierarchy {
         entt::entity _prev = entt::null;
 };
 
+void hierarchy_system( entt::registry& registry );
 
 #endif // _REPLICATOR_HIERARCHY_H_
 
