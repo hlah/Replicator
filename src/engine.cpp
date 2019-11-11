@@ -4,6 +4,7 @@
 #include "object.hpp"
 #include "matrix_op.hpp"
 #include "hierarchy.hpp"
+#include "time.hpp"
 
 #include "entt/entt.hpp"
 
@@ -12,6 +13,7 @@ void Engine::run(State* state_ptr) {
 
     spdlog::set_level(_loglevel);
 
+    // create window
     auto window = std::make_shared<Window>( _title, _width, _height, _aa );
     entt::registry registry;
     registry.set<std::shared_ptr<Window>>( window );
@@ -25,7 +27,7 @@ void Engine::run(State* state_ptr) {
     window->poll_events();
     state_ptr->on_start( registry );
 
-    double before = glfwGetTime();
+    double before = window->time();
     while( _running ) {
         window->poll_events();
 
@@ -35,7 +37,8 @@ void Engine::run(State* state_ptr) {
         _process_actions( registry, state_ptr, *window );
 
         window->clear();
-        double now = glfwGetTime();
+        double now = window->time();
+        registry.set<DeltaTime>( now - before );
         state_ptr->update( registry );
         before = now;
 

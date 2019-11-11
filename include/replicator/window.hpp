@@ -31,6 +31,7 @@ class Window {
         unsigned int width() const { return _width; }
         unsigned int height() const { return _height; }
         float aspect_ratio() const { return (float)_width/_height; }
+        double time() const { return glfwGetTime(); }
 
         float mouse_x() const { return _mouse_x; };
         float mouse_y() const { return _mouse_y; };
