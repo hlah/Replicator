@@ -59,7 +59,7 @@ class MeshBuilder {
         // Adde rectangle with normals
         void rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right );
         // Add a cube with clockwise winding
-        void cube( float side );
+        void cube( float side, const glm::vec3& pos = glm::vec3{0.0} );
         // Add a circle with given radius and section
         void circle( glm::vec3 radius_angle, glm::vec3 front, unsigned int sections, glm::vec3 position = glm::vec3{0.0} );
         // Add a cylinder

@@ -189,20 +189,20 @@ void MeshBuilder::rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right ) {
     add_index( _vertices.size()-2 );
 }
 
-void MeshBuilder::cube( float side ) {
+void MeshBuilder::cube( float side, const glm::vec3& pos ) {
     auto side_2 = side / 2.f;
     // FRONT
-    rect( {0.0, 0.0, side_2}, {0.0, side_2, 0.0}, {side_2, 0.0, 0.0} );
+    rect( pos + glm::vec3{0.0, 0.0, side_2}, {0.0, side_2, 0.0}, {side_2, 0.0, 0.0} );
     // BACK
-    rect( {0.0, 0.0, -side_2}, {0.0, side_2, 0.0}, {-side_2, 0.0, 0.0} );
+    rect( pos + glm::vec3{0.0, 0.0, -side_2}, {0.0, side_2, 0.0}, {-side_2, 0.0, 0.0} );
     // LEFT
-    rect( {-side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, side_2} );
+    rect( pos + glm::vec3{-side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, side_2} );
     // RIGHT
-    rect( {side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, -side_2} );
+    rect( pos + glm::vec3{side_2, 0.0, 0.0}, {0.0, side_2, 0.0}, {0.0, 0.0, -side_2} );
     // TOP
-    rect( {0.0, side_2, 0.0}, {0.0, 0.0, -side_2}, {side_2, 0.0, 0.0} );
+    rect( pos + glm::vec3{0.0, side_2, 0.0}, {0.0, 0.0, -side_2}, {side_2, 0.0, 0.0} );
     // BOTTOM
-    rect( {0.0, -side_2, 0.0}, {0.0, 0.0, side_2}, {side_2, 0.0, 0.0} );
+    rect( pos + glm::vec3{0.0, -side_2, 0.0}, {0.0, 0.0, side_2}, {side_2, 0.0, 0.0} );
 }
 
 void MeshBuilder::circle( glm::vec3 radius_angle, glm::vec3 front, unsigned int sections, glm::vec3 position ) {
