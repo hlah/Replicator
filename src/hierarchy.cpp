@@ -58,9 +58,11 @@ void Hierarchy::on_destroy(entt::entity entity, entt::registry& registry) {
             auto parent_hierarchy = registry.try_get<Hierarchy>( hierarchy._parent );
             if( parent_hierarchy != nullptr ) {
                 parent_hierarchy->_first = hierarchy._next;
-                auto next_hierarchy = registry.try_get<Hierarchy>( hierarchy._next );
-                if( next_hierarchy != nullptr ) {
-                    next_hierarchy->_prev = entt::null;
+                if( hierarchy._next != entt::null ) {
+                    auto next_hierarchy = registry.try_get<Hierarchy>( hierarchy._next );
+                    if( next_hierarchy != nullptr ) {
+                        next_hierarchy->_prev = entt::null;
+                    }
                 }
             }
         } 
