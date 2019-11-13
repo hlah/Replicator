@@ -24,6 +24,7 @@ class Material {
             float shininess
         ) : _ambient{color*ambient}, _diffuse{color*diffuse}, _specular{color*specular}, _shininess{shininess} {}
 
+        void add_ambient_texture( entt::resource_handle<Texture> texture ) { _ambient_textures.push_back( texture ); }
         void add_diffuse_texture( entt::resource_handle<Texture> texture ) { _diffuse_textures.push_back( texture ); }
         void add_specular_texture( entt::resource_handle<Texture> texture ) { _specular_textures.push_back( texture ); }
 
@@ -31,10 +32,12 @@ class Material {
         inline const glm::vec3& diffuse() const { return _diffuse; }
         inline const glm::vec3& specular() const { return _specular; }
         inline float shininess() const { return _shininess; }
+        inline const auto& ambient_textures() const { return _ambient_textures; }
         inline const auto& diffuse_textures() const { return _diffuse_textures; }
         inline const auto& specular_textures() const { return _specular_textures; }
 
     private:
+        std::vector<entt::resource_handle<Texture>> _ambient_textures{};
         std::vector<entt::resource_handle<Texture>> _diffuse_textures{};
         std::vector<entt::resource_handle<Texture>> _specular_textures{};
         glm::vec3 _ambient;

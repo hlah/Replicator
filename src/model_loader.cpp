@@ -138,6 +138,24 @@ std::vector<Material> get_materials( entt::registry& registry, const aiScene* sc
         spdlog::debug("Specular: r: {}, g: {}, b: {}", specular_color.r, specular_color.g, specular_color.b);
         spdlog::debug("Shininess: {}", shininess);
 
+        // Ambient textures:
+        for( unsigned int j=0; j<assimp_material->GetTextureCount(aiTextureType_AMBIENT); j++ ) {
+            aiString texture_path;
+            assimp_material->GetTexture(aiTextureType_AMBIENT, j, &texture_path);
+            spdlog::debug("Ambient texture: '{}'", texture_path.C_Str());
+            auto texture_handle = get_texture( registry, directory + std::string{"/"} + std::string{texture_path.C_Str()} );
+            if( texture_handle ) {
+                materials.back().add_ambient_texture( texture_handle );
+            }
+        }
+
+        // Emissive textures:
+        for( unsigned int j=0; j<assimp_material->GetTextureCount(aiTextureType_EMISSIVE); j++ ) {
+            aiString texture_path;
+            assimp_material->GetTexture(aiTextureType_EMISSIVE, j, &texture_path);
+            spdlog::debug("Emissive texture: '{}' (not used)", texture_path.C_Str());
+        }
+
         // Diffuse textures:
         for( unsigned int j=0; j<assimp_material->GetTextureCount(aiTextureType_DIFFUSE); j++ ) {
             aiString texture_path;
@@ -149,7 +167,7 @@ std::vector<Material> get_materials( entt::registry& registry, const aiScene* sc
             }
         }
 
-        // Specular
+        // Specular textures
         for( unsigned int j=0; j<assimp_material->GetTextureCount(aiTextureType_SPECULAR); j++ ) {
             aiString texture_path;
             assimp_material->GetTexture(aiTextureType_SPECULAR, j, &texture_path);
