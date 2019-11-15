@@ -13,6 +13,7 @@
 #include <memory>
 #include <map>
 
+#include "box.hpp"
 
 class Mesh {
     public:
@@ -69,6 +70,8 @@ class MeshBuilder {
 
         // Build mesh
         Mesh build();
+        // Get bounding box
+        Box bounding_box();
 
     private:
         std::vector<glm::vec4> _vertices;

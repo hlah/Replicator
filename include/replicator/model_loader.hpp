@@ -4,6 +4,8 @@
 #include "mesh.hpp"
 #include "material.hpp"
 #include "texture.hpp"
+#include "transform.hpp"
+#include "box.hpp"
 
 #include "entt/entt.hpp"
 
@@ -13,29 +15,43 @@
 
 #include <vector>
 
-entt::entity load_model( 
-        entt::registry& registry, 
-        const std::string& path, 
-        entt::resource_handle<ShaderProgram> program_handle 
-);
-
-std::vector<std::pair<Mesh,unsigned int>> get_meshes( const aiScene* scene );
-std::vector<Material> get_materials( entt::registry& registry, const aiScene* scene, const std::string directory );
-entt::resource_handle<Texture> get_texture( entt::registry& registry, const std::string path );
-entt::entity load_node( 
-        entt::registry& registry, 
-        aiNode* node,
-        const std::vector<std::pair<Mesh,unsigned int>>& meshes,
-        const std::vector<Material>& materials,
-        entt::resource_handle<ShaderProgram> program_handle,
-        const entt::entity& parent = entt::null
-);
-
-
-
-class ModelLoadException : public std::exception {
+class ModelLoader {
     public:
-        ModelLoadException( const std::string& msg ) : _msg{msg} { }
+        // Model loader constructor, revecie program handle to be attached to loaded meshes
+        ModelLoader( entt::resource_handle<ShaderProgram> program_handle ) : _program_handle{program_handle} {}
+
+        // Load model into registry from file in given path.
+        entt::entity load_model( 
+                entt::registry& registry, 
+                const std::string& path
+        );
+
+        // Get model bounding box.
+        Box bounding_box();
+    private:
+        Assimp::Importer _importer;
+        entt::resource_handle<ShaderProgram> _program_handle;
+        std::vector<std::pair<Mesh, unsigned int>> _meshes;
+        std::vector<MeshBuilder> _mesh_builders;
+        std::vector<Material> _materials;
+
+        void get_meshes( const aiScene* scene );
+        void get_materials( entt::registry& registry, const aiScene* scene, const std::string directory );
+        Transform get_transform( const aiNode* node ); 
+        entt::resource_handle<Texture> get_texture( entt::registry& registry, const std::string path );
+
+        entt::entity load_node( 
+                entt::registry& registry, 
+                aiNode* node,
+                const entt::entity& parent = entt::null
+        );
+
+        Box _bounding_box( aiNode* node );
+};
+
+class ModelLoaderException : public std::exception {
+    public:
+        ModelLoaderException( const std::string& msg ) : _msg{msg} { }
         const char* what() const throw() { return _msg.c_str(); }
 
     private:

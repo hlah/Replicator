@@ -133,7 +133,6 @@ void Mesh::draw( const ShaderProgram& program ) const {
     glBindVertexArray(0);
 }
 
-
 void MeshBuilder::add_vertex( glm::vec4 v, unsigned int count ) {
     for( unsigned int i=0; i<count; i++ ) {
         _vertices.push_back( v );
@@ -336,6 +335,20 @@ Mesh MeshBuilder::build() {
     }
 
     return Mesh{ _indices, _vertices, _colors, _normals, _texcoords };
+}
+
+Box MeshBuilder::bounding_box() {
+    glm::vec3 p1 = _vertices[0];
+    glm::vec3 p2 = _vertices[0];
+    for( size_t i=1; i<_vertices.size(); i++ ) {
+        p1.x = std::min(p1.x, _vertices[i].x);
+        p1.y = std::min(p1.y, _vertices[i].y);
+        p1.z = std::min(p1.z, _vertices[i].z);
+        p2.x = std::max(p1.x, _vertices[i].x);
+        p2.y = std::max(p1.y, _vertices[i].y);
+        p2.z = std::max(p1.z, _vertices[i].z);
+    }
+    return Box{ p1, p2 };
 }
 
 unsigned int MeshBuilder::_get_middle_vertex( std::map<std::pair<unsigned int, unsigned int>, unsigned int>& mp_map, std::vector<glm::vec3>& vertices, std::pair<unsigned int, unsigned int> segment ) {
