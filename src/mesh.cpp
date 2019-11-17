@@ -337,16 +337,17 @@ Mesh MeshBuilder::build() {
     return Mesh{ _indices, _vertices, _colors, _normals, _texcoords };
 }
 
-Box MeshBuilder::bounding_box() {
-    glm::vec3 p1 = _vertices[0];
-    glm::vec3 p2 = _vertices[0];
+Box MeshBuilder::bounding_box( const glm::mat4& transform ) {
+    glm::vec3 p1 = transform * _vertices[0];
+    glm::vec3 p2 = transform * _vertices[0];
     for( size_t i=1; i<_vertices.size(); i++ ) {
-        p1.x = std::min(p1.x, _vertices[i].x);
-        p1.y = std::min(p1.y, _vertices[i].y);
-        p1.z = std::min(p1.z, _vertices[i].z);
-        p2.x = std::max(p1.x, _vertices[i].x);
-        p2.y = std::max(p1.y, _vertices[i].y);
-        p2.z = std::max(p1.z, _vertices[i].z);
+        auto v = transform * _vertices[i];
+        p1.x = std::min(p1.x, v.x);
+        p1.y = std::min(p1.y, v.y);
+        p1.z = std::min(p1.z, v.z);
+        p2.x = std::max(p1.x, v.x);
+        p2.y = std::max(p1.y, v.y);
+        p2.z = std::max(p1.z, v.z);
     }
     return Box{ p1, p2 };
 }

@@ -71,7 +71,7 @@ class MeshBuilder {
         // Build mesh
         Mesh build();
         // Get bounding box
-        Box bounding_box();
+        Box bounding_box( const glm::mat4& transform = glm::mat4{} );
 
     private:
         std::vector<glm::vec4> _vertices;

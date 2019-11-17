@@ -236,23 +236,23 @@ Box ModelLoader::bounding_box() {
     if( _importer.GetScene() == nullptr || _importer.GetScene()->mRootNode == nullptr ) {
         throw ModelLoaderException{ "Cannot get bounding box without properly loaded scene."};
     }
-    return _bounding_box( _importer.GetScene()->mRootNode );
+    auto root_node = _importer.GetScene()->mRootNode;
+    return _bounding_box( root_node, get_transform(root_node).local_matrix() );
 }
 
-Box ModelLoader::_bounding_box( aiNode* node ) {
+Box ModelLoader::_bounding_box( aiNode* node, const glm::mat4& transform ) {
     Box box;
 
     for( unsigned int i=0; i<node->mNumMeshes; i++ ) {
-        auto mesh_box = _mesh_builders[node->mMeshes[i]].bounding_box();
+        auto mesh_box = _mesh_builders[node->mMeshes[i]].bounding_box( transform );
         box += mesh_box;
     }
 
     for( unsigned int i=0; i<node->mNumChildren; i++ ) {
-        auto child_box = _bounding_box( node->mChildren[i] );
+        auto child_node = node->mChildren[i];
+        auto child_box = _bounding_box( child_node, transform * get_transform( child_node ).local_matrix() );
         box += child_box;
     }
 
-    auto transform = get_transform( node );
-    box = transform * box;
     return box;
 }

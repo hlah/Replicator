@@ -39,9 +39,9 @@ Transform& Transform::rotate_z_global( float angle ) {
     return *this;
 }
 
-Transform& Transform::translate( float x, float y, float z ) {
+Transform& Transform::translate( const glm::vec4& translation ) {
     auto new_base = glm::mat4_cast( _rotation );
-    _translation += new_base * glm::vec4{ x, y, z, 0.0 };
+    _translation += new_base * translation;
     return *this;
 } 
 
@@ -75,4 +75,5 @@ void transform_system( entt::registry& registry ) {
     }
 
 }
+
 

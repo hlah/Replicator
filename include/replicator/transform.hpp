@@ -36,14 +36,18 @@ class Transform {
         inline Transform& translate_global( float x, float y, float z ) { _translation += glm::vec4{x, y, z, 0.0}; return *this; }
         inline Transform& translate_global( const glm::vec3& translation ) { _translation += glm::vec4{translation, 0.0}; return *this; }
         inline Transform& translate_global( const glm::vec4& translation ) { _translation += translation; return *this; }
-        Transform& translate( float x, float y, float z ); 
+        inline Transform& translate( float x, float y, float z ) { return translate( glm::vec4{x, y, z, 0.0} ); }; 
+        inline Transform& translate( const glm::vec3& translation ) { return translate( glm::vec4{translation, 0.0} ); }; 
+        Transform& translate( const glm::vec4& translation );
 
         inline void set_translation( const glm::vec3& translation ) { _translation = glm::vec4{translation, 0.0}; }
         inline const glm::vec4& get_translation() const { return _translation; }
 
         // scale
         inline Transform& scale( float sx, float sy, float sz ) { _scale *= glm::vec3{sx, sy, sz}; return *this; }
+        inline Transform& scale( float s ) { _scale *= glm::vec3{s, s, s}; return *this; }
         inline Transform& scale( const glm::vec3& s ) { _scale *= s; return *this; }
+
         inline void set_scale( const glm::vec3& s ) { _scale = s; }
         inline const glm::vec3& get_scale() const { return _scale; }
 

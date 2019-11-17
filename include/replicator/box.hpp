@@ -27,8 +27,8 @@ class Box {
         inline const auto& lesser() const { return _p1; };
         inline const auto& greater() const { return _p2; };
 
-        // normalize box
-        void normalize();
+        // scale box
+        inline void scale( float s )  { _p1 *= s; _p2 *= s; }
 
         // Box addition, returns the smallest box that containg both boxes
         Box operator+( const Box& other ) const;
@@ -44,10 +44,7 @@ class Box {
         // bigger corner
         glm::vec3 _p2;
 
-        friend Box operator*( const Transform& transform, const Box& box );
 };
-
-Box operator*( const Transform& transform, const Box& box );
 
 
 #endif // _REPLICATOR_BOX_H_

@@ -46,7 +46,7 @@ class ModelLoader {
                 const entt::entity& parent = entt::null
         );
 
-        Box _bounding_box( aiNode* node );
+        Box _bounding_box( aiNode* node, const glm::mat4& transform );
 };
 
 class ModelLoaderException : public std::exception {
