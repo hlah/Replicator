@@ -22,6 +22,10 @@ void Engine::run(State* state_ptr) {
     registry.on_construct<Hierarchy>().connect<&Hierarchy::on_construct>();
     registry.on_destroy<Hierarchy>().connect<&Hierarchy::on_destroy>();
 
+    // create default caches
+    registry.set<entt::resource_cache<ShaderProgram>>();
+    registry.set<entt::resource_cache<Texture>>();
+
     spdlog::info("Running!");
     
     window->poll_events();

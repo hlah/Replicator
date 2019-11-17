@@ -28,6 +28,7 @@ class Transform {
         Transform& rotate_x_global( float angle );
         Transform& rotate_y_global( float angle );
         Transform& rotate_z_global( float angle );
+        Transform& rotate_global( const glm::quat& rot );
 
         inline void set_rotation( const glm::quat& rot ) { _rotation = rot; }
         const glm::quat& get_rotation() const { return _rotation; }

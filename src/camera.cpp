@@ -33,9 +33,10 @@ void camera_system( entt::registry& registry ) {
                 view_matrix = glm::inverse( camera_transform_ptr->global_matrix() );
             }
             // TODO Optimization: update matrices only once for each shader program (from a model)
-            view.each([camera_ptr,&view_matrix](auto& model){
-                    model.program->uniform( "projection_transform", camera_ptr->projection_matrix );
-                    model.program->uniform( "view_transform", view_matrix );
+            auto& program_cache = registry.ctx<entt::resource_cache<ShaderProgram>>();
+            program_cache.each([camera_ptr,&view_matrix](ShaderProgram& program){
+                    program.uniform( "projection_transform", camera_ptr->projection_matrix );
+                    program.uniform( "view_transform", view_matrix );
             });
         } 
         else {

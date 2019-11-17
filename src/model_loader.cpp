@@ -11,7 +11,13 @@ entt::entity ModelLoader::load_model(
 ) {
     const auto scene = _importer.ReadFile(
             path,
-            aiProcess_Triangulate | aiProcess_GenNormals
+            aiProcess_Triangulate 
+            | aiProcess_GenNormals
+            | aiProcess_OptimizeMeshes
+            //| aiProcess_OptimizeGraph
+            //| aiProcess_JoinIdenticalVertices
+            | aiProcess_ImproveCacheLocality
+            //| aiProcess_RemoveRedundantMaterials
     );
 
     if( !scene || !scene->mRootNode ) {
@@ -237,11 +243,18 @@ Box ModelLoader::bounding_box() {
         throw ModelLoaderException{ "Cannot get bounding box without properly loaded scene."};
     }
     auto root_node = _importer.GetScene()->mRootNode;
-    return _bounding_box( root_node, get_transform(root_node).local_matrix() );
+    auto transform = get_transform(root_node);
+    spdlog::debug("Transform translation: {} {} {}", 
+            transform.get_translation().x,
+            transform.get_translation().y,
+            transform.get_translation().z
+    );
+    return _bounding_box( root_node, transform.local_matrix() );
 }
 
 Box ModelLoader::_bounding_box( aiNode* node, const glm::mat4& transform ) {
     Box box;
+
 
     for( unsigned int i=0; i<node->mNumMeshes; i++ ) {
         auto mesh_box = _mesh_builders[node->mMeshes[i]].bounding_box( transform );

@@ -44,6 +44,10 @@ Transform& Transform::translate( const glm::vec4& translation ) {
     _translation += new_base * translation;
     return *this;
 } 
+Transform& Transform::rotate_global( const glm::quat& rot ) {
+    _rotation = rot * _rotation;
+    return *this;
+}
 
 void transform_system( entt::registry& registry ) {
     registry.sort<Transform, Hierarchy>();
