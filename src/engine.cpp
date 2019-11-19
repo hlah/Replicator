@@ -16,7 +16,7 @@ void Engine::run(State* state_ptr) {
     // create window
     auto window = std::make_shared<Window>( _title, _width, _height, _aa );
     entt::registry registry;
-    registry.set<std::shared_ptr<Window>>( window );
+    registry.set<WindowHandler>( window );
 
     // watch for hierarchy changes
     registry.on_construct<Hierarchy>().connect<&Hierarchy::on_construct>();
@@ -78,9 +78,9 @@ ActionId Engine::get_action_id( const std::string& name ) {
     }
 }
 
-void Engine::bind_key( Key key, const std::string& action_name ) {
+void Engine::bind_button( std::variant<Key, MouseButton> button, const std::string& action_name ) {
     auto action = get_action_id( action_name );
-    _key_bindings[key] = action;
+    _bindings[button] = action;
 }
 
 void Engine::_process_actions( entt::registry& registry, State* state_ptr, Window& window ) {
@@ -92,22 +92,22 @@ void Engine::_process_actions( entt::registry& registry, State* state_ptr, Windo
     }
 
     // process input events
-    std::optional<std::pair<Key, KeyEventType>> key_event;
-    while( (key_event = window.next_key()) ) {
-        if( _key_bindings.count( key_event->first ) != 0 ) {
+    std::optional<std::pair<std::variant<Key, MouseButton>, InputEventType>> button_event;
+    while( (button_event = window.next_button()) ) {
+        if( _bindings.count( button_event->first ) != 0 ) {
             // Key press -> action ON
-            if( key_event->second == KeyEventType::Press ) {
+            if( button_event->second == InputEventType::Press ) {
                 auto transition = state_ptr->on_action( 
                         registry,
-                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _key_bindings.at( key_event->first ) ) }
+                        ActionEvent{ ActionEvent::Type::ON, _actions.at( _bindings.at( button_event->first ) ) }
                 );
                 _process_transition( transition );
             } 
             // Key release -> action OFF
-            else if( key_event->second == KeyEventType::Release ) {
+            else if( button_event->second == InputEventType::Release ) {
                 auto transition = state_ptr->on_action( 
                         registry,
-                        ActionEvent{ ActionEvent::Type::OFF, _actions.at( _key_bindings.at( key_event->first ) ) }
+                        ActionEvent{ ActionEvent::Type::OFF, _actions.at( _bindings.at( button_event->first ) ) }
                 );
                 _process_transition( transition );
             } 

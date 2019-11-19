@@ -126,10 +126,17 @@ enum class Key {
     Menu			        = GLFW_KEY_MENU
 };
 
-enum class KeyEventType {
+enum class InputEventType {
     Press = GLFW_PRESS,
     Release = GLFW_RELEASE,
     Repeat = GLFW_REPEAT
 };
+
+enum class MouseButton {
+    Left = GLFW_MOUSE_BUTTON_LEFT,
+    Middle = GLFW_MOUSE_BUTTON_MIDDLE,
+    Right = GLFW_MOUSE_BUTTON_RIGHT
+};
+
 
 #endif // _REPLICATOR_KEYS_HPP_

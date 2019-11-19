@@ -5,11 +5,13 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
-#include "keys.hpp"
+#include "input.hpp"
 
 #include <memory>
 #include <queue>
 #include <optional>
+#include <variant>
+#include <memory>
 
 class Window {
     public:
@@ -56,7 +58,7 @@ class Window {
         void clear_color( float red, float green, float blue, float alpha=1.0 );
 
         // get next key
-        std::optional<std::pair<Key, KeyEventType>> next_key();
+        std::optional<std::pair<std::variant<Key, MouseButton>, InputEventType>> next_button();
 
     private:
         Window( const Window& other ) = delete;
@@ -71,7 +73,7 @@ class Window {
         bool _mouse_moved = false;
 
         // event queues
-        std::queue<std::pair<Key, KeyEventType>> _key_queue;
+        std::queue<std::pair<std::variant<Key, MouseButton>, InputEventType>> _button_queue;
 
         
         /// Private methods ///
@@ -88,10 +90,13 @@ class Window {
         static void _glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
         static void _glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void _glfw_mouse_pos_callback(GLFWwindow* window, double xpos, double ypos);
+        static void _glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 
         friend class Engine;
 };
+
+typedef std::shared_ptr<Window> WindowHandler;
 
 class WindowException : public std::exception {
     public:

@@ -78,6 +78,7 @@ Window::Window(const std::string& title, unsigned int width, unsigned int height
         glfwSetFramebufferSizeCallback( _glfw_window_ptr, Window::_glfw_framebuffer_size_callback );
         glfwSetKeyCallback( _glfw_window_ptr, Window::_glfw_key_callback );
         glfwSetCursorPosCallback( _glfw_window_ptr, Window::_glfw_mouse_pos_callback );
+        glfwSetMouseButtonCallback(_glfw_window_ptr, Window::_glfw_mouse_button_callback);
 
         _window_count++;
         _current_window = this;
@@ -91,7 +92,7 @@ Window::Window( Window&& other )
       _width{other._width},
       _height{other._height},
       _changed_size{other._changed_size},
-      _key_queue{other._key_queue}
+      _button_queue{other._button_queue}
 {
     other._glfw_window_ptr = nullptr;
     _current_window = this;
@@ -102,7 +103,7 @@ Window& Window::operator=( Window&& other ) {
     _width = other._width;
     _height = other._height;
     _changed_size = other._changed_size;
-    _key_queue = other._key_queue;
+    _button_queue = other._button_queue;
 
     other._glfw_window_ptr = nullptr;
 
@@ -140,11 +141,11 @@ void Window::clear_color( float red, float green, float blue, float alpha ) {
     glClearColor( red, green, blue, alpha );
 }
 
-std::optional<std::pair<Key, KeyEventType>> Window::next_key() {
-    std::optional<std::pair<Key, KeyEventType>> next;
-    if( !_key_queue.empty() ) {
-        next = _key_queue.front();
-        _key_queue.pop();
+std::optional<std::pair<std::variant<Key, MouseButton>, InputEventType>> Window::next_button() {
+    std::optional<std::pair<std::variant<Key, MouseButton>, InputEventType>> next;
+    if( !_button_queue.empty() ) {
+        next = _button_queue.front();
+        _button_queue.pop();
     }
     return next;
 }
@@ -158,13 +159,17 @@ void Window::_glfw_framebuffer_size_callback(GLFWwindow* window, int width, int 
 }
 
 void Window::_glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    _current_window->_key_queue.push( { (Key)key, (KeyEventType)action } );
+    _current_window->_button_queue.push( { (Key)key, (InputEventType)action } );
 }
 
 void Window::_glfw_mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     _current_window->_mouse_x = xpos;
     _current_window->_mouse_y = ypos;
     _current_window->_mouse_moved = true;
+}
+
+void Window::_glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    _current_window->_button_queue.push( { (MouseButton)button, (InputEventType)action } );
 }
 
 /// Error callbacks

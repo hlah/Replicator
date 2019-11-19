@@ -2,7 +2,7 @@
 #define _REPLICATOR_ENGINE_HPP_
 
 #include "state.hpp"
-#include "keys.hpp"
+#include "input.hpp"
 #include "window.hpp"
 
 #include "spdlog/spdlog.h"
@@ -27,7 +27,7 @@ class Engine {
         void set_aa(unsigned int aa) { _aa = aa; };
 
         ActionId get_action_id( const std::string& name );
-        void bind_key( Key key, const std::string& action_name );
+        void bind_button( std::variant<Key, MouseButton> button, const std::string& action_name );
 
 
     private:
@@ -37,7 +37,7 @@ class Engine {
 
         ActionId _next_action_id = 0;
         std::unordered_map<ActionId, std::string> _actions;
-        std::unordered_map<Key, ActionId> _key_bindings;
+        std::unordered_map<std::variant<Key, MouseButton>, ActionId> _bindings;
 
         // process actions
         void _process_actions( entt::registry& registry, State* state_ptr, Window& window );
