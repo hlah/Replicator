@@ -57,7 +57,7 @@ file(GLOB_RECURSE SOURCES src/*.cpp src/*.c)
 add_library(${PROJECT_NAME} ${SOURCES})
 # Add include folder
 include_directories(include/replicator include)
-target_include_directories(${PROJECT_NAME} INTERFACE include)
+target_include_directories(${PROJECT_NAME} INTERFACE include include/replicator/)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
