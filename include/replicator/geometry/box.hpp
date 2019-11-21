@@ -13,7 +13,7 @@ class Box {
     public:
         // reversed infinite box (identity element for box sum);
         Box() : _p1{std::numeric_limits<float>::infinity()}, _p2{-std::numeric_limits<float>::infinity()} {}
-        // box with lesser corner at the origin and the other given
+        // box with min corner at the origin and the other given
         Box(glm::vec3 p2) : _p1{0.0}, _p2{p2} {}
         // box with given corners
         Box(glm::vec3 p1, glm::vec3 p2) : _p1{p1}, _p2{p2} {}
@@ -24,8 +24,8 @@ class Box {
         inline float length() const { return _p2.z - _p1.z; }
 
         // get corners
-        inline const auto& lesser() const { return _p1; };
-        inline const auto& greater() const { return _p2; };
+        inline const auto& min() const { return _p1; };
+        inline const auto& max() const { return _p2; };
 
         // scale box
         inline void scale( float s )  { _p1 *= s; _p2 *= s; }
@@ -39,12 +39,14 @@ class Box {
         static Box bounding_box( const entt::registry&, entt::entity entity );
 
     private:
-        // lesser corner
+        // min corner
         glm::vec3 _p1;
-        // bigger corner
+        // max corner
         glm::vec3 _p2;
 
 };
+
+Box operator*( const glm::mat4& transform, const Box& box ); 
 
 
 #endif // _REPLICATOR_BOX_H_

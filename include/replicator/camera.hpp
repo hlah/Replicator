@@ -18,7 +18,6 @@ struct Camera {
     // Create perspective camera
     Camera( float fov, float near, float far, float aspect_ratio=1.0 );
 
-
     // set aspect ration
     void set_aspect_ratio(float aspect_ratio);
 };

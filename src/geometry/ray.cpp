@@ -6,6 +6,8 @@
 
 #include "spdlog/spdlog.h"
 
+#include <limits>
+
 std::optional<std::pair<float, glm::vec3>> Ray::intersects( const Plane& plane ) {
     std::optional<std::pair<float, glm::vec3>> result;
 
@@ -14,6 +16,45 @@ std::optional<std::pair<float, glm::vec3>> Ray::intersects( const Plane& plane )
         auto distance = glm::dot((plane.position() - _position), plane.normal())/denominator;
         auto point = _position + ( distance * _direction );
         result = {distance, point};
+    }
+
+    return result;
+}
+
+std::optional<std::pair<float, glm::vec3>> Ray::intersects( const Box& box ) {
+    std::optional<std::pair<float, glm::vec3>> result;
+
+    glm::vec3 candidates;
+    for( size_t i=0; i<3; i++ ) {
+        if( direction()[i] < 0.0 ) {
+            candidates[i] = box.max()[i];
+        } else {
+            candidates[i] = box.min()[i];
+        }
+    }
+
+    glm::vec3 distances{-std::numeric_limits<float>::infinity()};
+    size_t max_i = 0;
+    for( size_t i=0; i<3; i++ ) {
+        if( direction()[i] != 0.0 ) {
+            distances[i] = (candidates[i] - position()[i]) / direction()[i];
+            if( distances[i] > distances[max_i] ) {
+                max_i = i;
+            }
+        }
+    }
+
+    if( distances[max_i] >= 0.0 ) {
+        size_t other1 = ( max_i + 1 ) % 3;
+        size_t other2 = ( max_i + 2 ) % 3;
+        auto point = position() + distances[max_i] * direction();
+        if(     point[other1] <= box.max()[other1] 
+             && point[other1] >= box.min()[other1] 
+             && point[other2] <= box.max()[other2] 
+             && point[other2] >= box.min()[other2] ) 
+        {
+            result = {distances[max_i], point};
+        }
     }
 
     return result;

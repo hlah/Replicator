@@ -5,7 +5,7 @@
 #include "material.hpp"
 #include "texture.hpp"
 #include "transform.hpp"
-#include "box.hpp"
+#include "geometry/box.hpp"
 
 #include "entt/entt.hpp"
 

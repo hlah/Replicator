@@ -2,6 +2,7 @@
 #define _REPLICATOR_RAY_H_
 
 #include "geometry/plane.hpp"
+#include "geometry/box.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/glm.hpp"
@@ -17,6 +18,8 @@ class Ray {
 
         // checks intersection with plane
         std::optional<std::pair<float, glm::vec3>> intersects( const Plane& plane );
+        // check intersection with box
+        std::optional<std::pair<float, glm::vec3>> intersects( const Box& box );
 
         inline const glm::vec3& position() const { return _position; }
         inline const glm::vec3& direction() const { return _direction; }

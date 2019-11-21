@@ -1,8 +1,9 @@
 #ifndef _REPLICATOR_MESH_HPP_
 #define _REPLICATOR_MESH_HPP_
-
-
 #define GLM_FORCE_SWIZZLE
+
+#include "geometry/box.hpp"
+
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glad/glad.h"
@@ -13,7 +14,6 @@
 #include <memory>
 #include <map>
 
-#include "box.hpp"
 
 class Mesh {
     public:
