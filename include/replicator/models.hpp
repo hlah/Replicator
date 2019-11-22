@@ -6,6 +6,9 @@
 
 #include "entt/entt.hpp"
 
+// Component for model hidding
+struct Hidden{};
+
 // Model compoenent
 struct Model {
     Mesh mesh;

@@ -6,7 +6,7 @@
 
 // model system
 void model_system( entt::registry& registry ) {
-    auto view = registry.view<Model, const Transform>();
+    auto view = registry.group<Model>(entt::get<Transform>, entt::exclude<Hidden>);
     view.each([&registry](auto entity, auto& model, const auto& transform){
             model.program->uniform( "model_transform", transform.global_matrix() );
             auto material_ptr = registry.try_get<Material>( entity );

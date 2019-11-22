@@ -20,7 +20,6 @@ void camera_system( entt::registry& registry ) {
     if( current_camera_ptr != nullptr ) {
         auto camera_ptr = registry.try_get<Camera>( current_camera_ptr->entity );
         if( camera_ptr != nullptr ) {
-            auto view = registry.view<Model>();
             auto window = registry.ctx<std::shared_ptr<Window>>();
             // Reset projection matrix on window resize
             if( window->resized() ) {
