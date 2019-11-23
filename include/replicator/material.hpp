@@ -24,6 +24,11 @@ class Material {
             float shininess
         ) : _ambient{color*ambient}, _diffuse{color*diffuse}, _specular{color*specular}, _shininess{shininess} {}
 
+
+        inline void set_ambient( const glm::vec3& value ) { _ambient = value; }
+        inline void set_diffuse( const glm::vec3& value ) { _diffuse = value; }
+        inline void set_specular( const glm::vec3& value ) { _specular = value; }
+
         void add_ambient_texture( entt::resource_handle<Texture> texture ) { _ambient_textures.push_back( texture ); }
         void add_diffuse_texture( entt::resource_handle<Texture> texture ) { _diffuse_textures.push_back( texture ); }
         void add_specular_texture( entt::resource_handle<Texture> texture ) { _specular_textures.push_back( texture ); }
