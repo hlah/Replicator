@@ -52,6 +52,9 @@ class Transform {
         inline void set_scale( const glm::vec3& s ) { _scale = s; }
         inline const glm::vec3& get_scale() const { return _scale; }
 
+        // update transform components when transform component is added
+        static void on_change(entt::entity entity, entt::registry& registry, Transform& transform);
+
     private:
         glm::vec4 _translation{0.0, 0.0, 0.0, 0.0};
         glm::vec3 _scale{1.0, 1.0, 1.0};

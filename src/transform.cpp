@@ -1,8 +1,10 @@
 #include "transform.hpp"
 #include "hierarchy.hpp"
+#include "dirty.hpp"
+
+#include "matrix_op.hpp"
 
 #include "spdlog/spdlog.h"
-#include "matrix_op.hpp"
 
 glm::mat4 Transform::local_matrix() const {
     return matrix_op::translation( _translation.x, _translation.y, _translation.z )
@@ -49,20 +51,20 @@ Transform& Transform::rotate_global( const glm::quat& rot ) {
     return *this;
 }
 
+
+void Transform::on_change(entt::entity entity, entt::registry& registry, Transform& transform) {
+    Dirty<Transform>::dirty_recurse( registry, entity );
+}
+
 void transform_system( entt::registry& registry ) {
     registry.sort<Transform, Hierarchy>();
-    auto view = registry.view<Transform, Hierarchy>();
+    registry.sort<Dirty<Transform>, Transform>();
+    auto view = registry.view<Transform, Hierarchy, Dirty<Transform>>();
 
-    //spdlog::debug("Sorted:");
+
     for( auto entity : view ) {
         auto& transform = registry.get<Transform>(entity);
         auto& hierarchy = registry.get<Hierarchy>(entity);
-
-        auto name = std::string{"entity_"} + std::to_string( (int)entity );
-        if( registry.has<std::string>( entity ) ) { 
-            name +=  std::string{" ("} + registry.get<std::string>(entity) + std::string{")"};
-        }
-        //spdlog::debug("{}", name);
 
         if( hierarchy.parent() != entt::null ) {
             auto parent_transform_ptr = registry.try_get<Transform>(hierarchy.parent());
@@ -77,6 +79,8 @@ void transform_system( entt::registry& registry ) {
         new_transform._global = transform.local_matrix();
         registry.replace<Transform>( entity, new_transform );
     }
+
+    registry.reset<Dirty<Transform>>();
 
 }
 

@@ -21,6 +21,9 @@ void Engine::run(State* state_ptr) {
     // watch for hierarchy changes
     registry.on_construct<Hierarchy>().connect<&Hierarchy::on_construct>();
     registry.on_destroy<Hierarchy>().connect<&Hierarchy::on_destroy>();
+    // watch for transform changes
+    registry.on_construct<Transform>().connect<&Transform::on_change>();
+    registry.on_replace<Transform>().connect<&Transform::on_change>();
 
     // create default caches
     registry.set<entt::resource_cache<ShaderProgram>>();

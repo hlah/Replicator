@@ -244,11 +244,6 @@ Box ModelLoader::bounding_box() {
     }
     auto root_node = _importer.GetScene()->mRootNode;
     auto transform = get_transform(root_node);
-    spdlog::debug("Transform translation: {} {} {}", 
-            transform.get_translation().x,
-            transform.get_translation().y,
-            transform.get_translation().z
-    );
     return _bounding_box( root_node, transform.local_matrix() );
 }
 

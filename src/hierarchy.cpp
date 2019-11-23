@@ -85,7 +85,6 @@ void Hierarchy::on_destroy(entt::entity entity, entt::registry& registry) {
 void hierarchy_system( entt::registry& registry ) {
     // sort if any changes were made
     if( registry.try_ctx<HierarchyChanged>() != nullptr ) {
-        spdlog::debug("Sorted!!!!!!!");
         registry.sort<Hierarchy>([&registry](const entt::entity lhs, const entt::entity rhs){
                 auto& right_h = registry.get<Hierarchy>( rhs );
                 return right_h.compare( registry, lhs );
