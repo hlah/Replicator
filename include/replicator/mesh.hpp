@@ -57,6 +57,11 @@ class MeshBuilder {
         // Add index
         void add_index( GLuint index );
 
+        void clear_vertices() { _vertices.clear(); }
+        void clear_colors() { _colors.clear(); }
+        void clear_normals() { _normals.clear(); }
+        void clear_texcoord() { _texcoords.clear(); }
+
         // Adde rectangle with normals
         void rect( glm::vec3 pos, glm::vec3 top, glm::vec3 right );
         // Add a cube with clockwise winding
