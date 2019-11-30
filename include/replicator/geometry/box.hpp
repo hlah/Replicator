@@ -34,6 +34,9 @@ class Box {
         Box operator+( const Box& other ) const;
         void operator+=( const Box& other );
 
+        // Box box intersection test
+        bool intersects( const Box& other ) const;
+
         std::string to_string();
 
         static Box bounding_box( const entt::registry&, entt::entity entity );

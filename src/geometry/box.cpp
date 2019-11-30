@@ -17,6 +17,13 @@ void Box::operator+=( const Box& other ) {
     _p2 = { std::max( _p2.x, other._p2.x ), std::max( _p2.y, other._p2.y ), std::max( _p2.z, other._p2.z ) };
 }
 
+bool Box::intersects( const Box& other ) const {
+    if( _p2.x < other._p2.x || _p1.x > other._p2.x ) return false;
+    if( _p2.z < other._p2.z || _p1.z > other._p2.z ) return false;
+    if( _p2.y < other._p2.y || _p1.y > other._p2.y ) return false;
+    return true;
+}
+
 std::string Box::to_string() {
     std::stringstream strs;
     strs << "x: " << _p1.x << ":" << _p2.x
