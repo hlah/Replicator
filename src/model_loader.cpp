@@ -18,6 +18,8 @@ entt::entity ModelLoader::load_model(
             //| aiProcess_JoinIdenticalVertices
             | aiProcess_ImproveCacheLocality
             //| aiProcess_RemoveRedundantMaterials
+            | aiProcess_SortByPType
+            | aiProcess_FindDegenerates
     );
 
     if( !scene || !scene->mRootNode ) {
@@ -122,11 +124,14 @@ void ModelLoader::get_materials( entt::registry& registry, const aiScene* scene,
         aiString name;
         float shininess;
 
+        bool twosided;
+
         assimp_material->Get( AI_MATKEY_COLOR_AMBIENT, ambient_color );
         assimp_material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse_color );
         assimp_material->Get( AI_MATKEY_COLOR_SPECULAR, specular_color );
         assimp_material->Get( AI_MATKEY_SHININESS, shininess );
         assimp_material->Get( AI_MATKEY_NAME, name );
+
 
         _materials.emplace_back(
                 glm::vec3{ ambient_color.r, ambient_color.g, ambient_color.b },
@@ -134,6 +139,11 @@ void ModelLoader::get_materials( entt::registry& registry, const aiScene* scene,
                 glm::vec3{ specular_color.r, specular_color.g, specular_color.b },
                 shininess
         );
+
+        assimp_material->Get( AI_MATKEY_TWOSIDED, twosided );
+        if( twosided ) {
+            _materials.back().set_twosided(true);
+        }
 
         spdlog::trace("Material '{}' ({}):", name.C_Str(), i);
         spdlog::trace("Ambient: r: {}, g: {}, b: {}", ambient_color.r, ambient_color.g, ambient_color.b);
@@ -203,7 +213,19 @@ Transform ModelLoader::get_transform( const aiNode* node ) {
     Transform transform;
     transform.scale( scalling.x, scalling.y, scalling.z );
     transform.rotate( glm::quat{ rotation.w, rotation.x, rotation.y, rotation.z } );
-    transform.translate( translation.x, translation.y, translation.z );
+    transform.translate_global( translation.x, translation.y, translation.z );
+
+    /*
+    auto t = node->mTransformation;
+    auto l = transform.local_matrix();
+    spdlog::debug("\n{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t///\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\n{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t///\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\n{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t///\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\n{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t///\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\n",
+            t.a1, t.a2, t.a3, t.a4,     l[0][0], l[1][0], l[2][0], l[3][0],
+            t.b1, t.b2, t.b3, t.b4,     l[0][1], l[1][1], l[2][1], l[3][1],
+            t.c1, t.c2, t.c3, t.c4,     l[0][2], l[1][2], l[2][2], l[3][2],
+            t.d1, t.d2, t.d3, t.d4,     l[0][3], l[1][3], l[2][3], l[3][3]
+    );
+    */
+
     return transform;
 } 
 

@@ -41,6 +41,9 @@ class Material {
         inline const auto& diffuse_textures() const { return _diffuse_textures; }
         inline const auto& specular_textures() const { return _specular_textures; }
 
+        inline void set_twosided( bool value ) { _twosided = value; }
+        inline bool twosided() const { return _twosided; }
+
     private:
         std::vector<entt::resource_handle<Texture>> _ambient_textures{};
         std::vector<entt::resource_handle<Texture>> _diffuse_textures{};
@@ -49,6 +52,7 @@ class Material {
         glm::vec3 _diffuse;
         glm::vec3 _specular;
         float _shininess;
+        bool _twosided = false;
 };
 
 #endif // _REPLICATOR_MATERIAL_H_

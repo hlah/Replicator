@@ -18,7 +18,9 @@
 class ModelLoader {
     public:
         // Model loader constructor, revecie program handle to be attached to loaded meshes
-        ModelLoader( entt::resource_handle<ShaderProgram> program_handle ) : _program_handle{program_handle} {}
+        ModelLoader( entt::resource_handle<ShaderProgram> program_handle ) : _program_handle{program_handle} {
+            _importer.SetPropertyInteger( AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE );
+        }
 
         // Load model into registry from file in given path.
         entt::entity load_model( 

@@ -200,7 +200,7 @@ void GLAPIENTRY opengl_error_callback(
             spdlog::debug("OpenGL: {}", message);
             break;
         default:
-            spdlog::debug("OpenGL: {}", message);
+            spdlog::trace("OpenGL: {}", message);
             break;
     }
 }

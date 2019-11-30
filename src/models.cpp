@@ -12,10 +12,16 @@ void model_system( entt::registry& registry ) {
             auto material_ptr = registry.try_get<Material>( entity );
             if( material_ptr != nullptr ) {
                 model.program->uniform( "material", *material_ptr );
+                if( material_ptr->twosided() ) {
+                    glDisable(GL_CULL_FACE);
+                } else {
+                    glEnable(GL_CULL_FACE);
+                }
             }
             model.mesh.draw( *model.program );
             if( material_ptr != nullptr ) {
                 model.program->uniform( "material", Material{} );
+                glEnable(GL_CULL_FACE);
             }
     });
 }
