@@ -8,7 +8,7 @@ entt::entity deepcopy( entt::registry& registry, entt::entity entity, entt::enti
 
     auto entity_copy = registry.create( entity, registry, entt::exclude_t<Hierarchy>{} );
 
-    // create new hierarchu for copy
+    // create new hierarchy for copy
     auto entity_hierarchy_ptr = registry.try_get<Hierarchy>( entity );
     if( entity_hierarchy_ptr != nullptr ) {
         registry.assign<Hierarchy>( entity_copy, copy_parent );

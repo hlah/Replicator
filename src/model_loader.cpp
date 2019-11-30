@@ -124,7 +124,7 @@ void ModelLoader::get_materials( entt::registry& registry, const aiScene* scene,
         aiString name;
         float shininess;
 
-        bool twosided;
+        int twosided;
 
         assimp_material->Get( AI_MATKEY_COLOR_AMBIENT, ambient_color );
         assimp_material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse_color );
